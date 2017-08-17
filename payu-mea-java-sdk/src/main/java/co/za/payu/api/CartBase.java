@@ -10,6 +10,10 @@
 package co.za.payu.api;
 
 import co.za.payu.base.soap.PayUModel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * Class CartBase
@@ -18,5 +22,33 @@ import co.za.payu.base.soap.PayUModel;
  *
  * @package co.za.payu.api
  */
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
 public class CartBase extends PayUModel {
+    /**
+     * Merchant identifier of the purchase unit. Optional parameter
+     */
+    private String referenceId;
+    /**
+     * Amount being collected.
+     */
+    private Amount amount;
+    /**
+     * Recipient of the funds in this transaction.
+     */
+    private Merchant merchant;
+    /**
+     * Description of what is being paid for.
+     */
+    private String description;
+    /**
+     * invoice number to track this payment
+     */
+    private String invoiceNumber;
+    /**
+     * List of items being paid for.
+     */
+    private ItemList itemList;
 }
