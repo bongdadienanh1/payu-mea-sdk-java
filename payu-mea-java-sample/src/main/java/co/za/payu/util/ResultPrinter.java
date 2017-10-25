@@ -1,4 +1,4 @@
-package co.za.payu.api.util;
+package co.za.payu.util;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ public class ResultPrinter {
         addDataToAttributeList(req, "errors", error);
         if (error != null) {
             try {
-                req.getRequestDispatcher("response.jsp").forward(req, resp);
+                req.getRequestDispatcher("../../response.jsp").forward(req, resp);
             } catch (ServletException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
