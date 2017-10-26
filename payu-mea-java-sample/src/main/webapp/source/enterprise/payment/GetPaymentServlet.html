@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>enterprise/payment/CreatePaymentWithSavedCardServlet</title>
+    <title>enterprise/payment/GetPaymentServlet</title>
 </head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
@@ -20,7 +20,7 @@
     <div class="segment">
         <div class="comments ">
             <div class="wrapper">
-                <h1 id="createpayment-using-credit-card-sample">GetPayment credit card Sample</h1>
+                <h1 id="getpayment-sample">GetPayment credit card Sample</h1>
                 <p>This sample code demonstrate how you can get the details of a payment.</p>
             </div>
         </div>
@@ -54,10 +54,10 @@
             </div>
         </div>
         <div class="code">
-<div class="wrapper"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CreatePaymentWithSavedCardServlet</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">HttpServlet</span> </span>{
+<div class="wrapper"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GetPaymentServlet</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">HttpServlet</span> </span>{
 
     <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = <span class="hljs-number">1L</span>;
-    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger LOGGER = Logger.getLogger(CreatePaymentRealTimeRecurringServlet.class);
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> Logger LOGGER = Logger.getLogger(GetPaymentServlet.class);
 
     <span class="hljs-keyword">private</span> ObjectFactory objectFactory = <span class="hljs-keyword">new</span> ObjectFactory();
 
@@ -71,7 +71,7 @@
     <div class="segment">
         <div class="comments ">
             <div class="wrapper">
-                <h2 id="create">Create</h2>
+                <h2 id="create">Get</h2>
                 <p>Sample showing to retrieve the details of a payment transaction</p>
             </div>
         </div>
@@ -117,8 +117,8 @@
     <div class="segment">
         <div class="comments ">
             <div class="wrapper">
-                <h3 id="setup-rtr">Simulate setup of a Real Time Recurring credit card payment</h3>
-                <p>The transaction result in a PayUReference returned. The PayUReference is then used to retrieve transaction details</p>
+                <h3 id="setup-rtr">Simulate credit card payment</h3>
+                <p>The transaction result in a PayUReference returned in the response object. The PayUReference is then used to retrieve transaction details</p>
             </div>
         </div>
         <div class="code">
@@ -157,7 +157,7 @@
             <div class="wrapper">
                 <h3 id="payment">Payment</h3>
                 <p>A Payment defines the contract of a payment - what is the payment for and who is fulfilling it.
-                    Payment is created with a `DoTransaction`</p>
+                    Payment is created with a `GetTransaction`</p>
             </div>
         </div>
         <div class="code">
@@ -331,7 +331,7 @@
         <div class="code">
             <div class="wrapper">
         <span class="hljs-keyword">try</span> {
-            doTransactionResponseMessage = (DoTransactionResponseMessage) payment.create(apiContext);
+            doTransactionResponseMessage = (DoTransactionResponseMessage) payment.get(apiContext);
             LOGGER.info(<span class="hljs-string">"Created payment with id = "</span> + doTransactionResponseMessage.getPayUReference() + <span class="hljs-string">" and result code = "</span> + doTransactionResponseMessage.getResultCode());
             ResultPrinter.addResult(req, resp, <span class="hljs-string">"Create Payment With Credit Card"</span>, Payment.getLastRequest(), Payment.getLastResponse(), <span class="hljs-keyword">null</span>);
         } <span class="hljs-keyword">catch</span> (PayUSOAPException ex) {
