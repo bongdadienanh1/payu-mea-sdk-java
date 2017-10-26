@@ -48,21 +48,26 @@ public class LookupGetPaymentMethodServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse lookupGetPaymentMethod(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account7);
 
-        createCreditCard(req, resp, apiContext);
+        createCreditCard(req, resp, apiContext, baseUrl);
 
         CustomField customField = objectFactory.createCustomField()
                 .setKey("MerchantUserId")
-                .setValue("891");
+                .setValue("890");
 
+        // ###GetLookupTransaction
+        // A transaction information lookup request object
         GetLookupTransaction getLookupTransaction = objectFactory.createGetLookupTransaction()
                 .setLookupTransactionType(LookupTransactionType.TOKEN);
         getLookupTransaction.getCustomfield().add(customField);
 
-        // ###Payment
-        // A Payment Resource
+        // ###LookupTransaction
+        // A LookupTransaction defines what information you want to retrieve.
+        // LookupTransaction is created with a `GetLookupTransaction`
         LookupTransaction lookupTransaction = new LookupTransaction();
         lookupTransaction.setRequest(getLookupTransaction);
 
@@ -72,11 +77,11 @@ public class LookupGetPaymentMethodServlet extends HttpServlet {
 
             lookupTransactionResponseMessage = (LookupTransactionResponseMessage) lookupTransaction.lookup(apiContext);
 
-            LOGGER.info("Created payment with id = " + lookupTransactionResponseMessage.getPayUReference()
+            LOGGER.info("Lookup transaction request with id = " + lookupTransactionResponseMessage.getPayUReference()
                     + " and result code = " + lookupTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Lookup Transactions", JSONFormatter.toJSON(getLookupTransaction),
-                    JSONFormatter.toJSON(lookupTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Lookup Transactions", LookupTransaction.getLastRequest(),
+                    LookupTransaction.getLastResponse(), null);
 
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Lookup Transactions", JSONFormatter.toJSON(getLookupTransaction),
@@ -86,9 +91,7 @@ public class LookupGetPaymentMethodServlet extends HttpServlet {
         return lookupTransactionResponseMessage;
     }
 
-    private IResponse createCreditCard(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext) {
-
-        String baseUrl = BaseSample.getBaseUrl(req);
+    private IResponse createCreditCard(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
 
         // ###CreditCard
         // A resource representing a credit card that can be
@@ -117,7 +120,7 @@ public class LookupGetPaymentMethodServlet extends HttpServlet {
                 .setEmail("joe.shopper@example.com")
                 .setMobile("0748523695")
                 .setCountryCode("27")
-                .setMerchantUserId("891")
+                .setMerchantUserId("890")
                 .setAddress1("21 Main Road")
                 .setAddress2("Cape Town")
                 .setAddressCity("Cape Town")
@@ -148,8 +151,7 @@ public class LookupGetPaymentMethodServlet extends HttpServlet {
         // payment - what is the payment for and who
         // is fulfilling it. Payment is created with
         // a `DoTransaction`
-        Payment payment = new Payment
-                ();
+        Payment payment = new Payment();
         payment.setRequest(doTransaction);
         DoTransactionResponseMessage doTransactionResponseMessage = null;
 
@@ -159,8 +161,8 @@ public class LookupGetPaymentMethodServlet extends HttpServlet {
             LOGGER.info("Created and save credit card with id = " + doTransactionResponseMessage.getPayUReference()
                     + " and result code = " + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Create Payment and Save Credit Card", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Create Payment and Save Credit Card", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
 
         } catch(Exception ex) {
             ResultPrinter.addResult(req, resp, "Create Payment and Save Credit Card", JSONFormatter.toJSON(doTransactionResponseMessage),
