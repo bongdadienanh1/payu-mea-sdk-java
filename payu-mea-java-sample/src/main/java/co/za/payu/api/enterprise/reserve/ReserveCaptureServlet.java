@@ -47,15 +47,11 @@ public class ReserveCaptureServlet extends HttpServlet {
 
     @SuppressWarnings("Duplicates")
     private IResponse reserveCapture(HttpServletRequest req, HttpServletResponse resp) {
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+
+        String baseUrl = BaseSample.getBaseUrl(req);
 
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account1);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage createdReserve = (DoTransactionResponseMessage) createReservePayment(req, resp, apiContext, baseUrl);
 
@@ -100,7 +96,7 @@ public class ReserveCaptureServlet extends HttpServlet {
 
             doTransactionResponseMessage = (DoTransactionResponseMessage) payment.capture(apiContext);
 
-            LOGGER.info("Captured/finalized payment with id = " + doTransactionResponseMessage.getPayUReference() +
+            LOGGER.info("Captured/finalized reserve payment with id = " + doTransactionResponseMessage.getPayUReference() +
                     " and status = " + doTransactionResponseMessage.getResultCode());
             ResultPrinter.addResult(req, resp, "Capture/Finalize Reserved Payment", JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
         } catch (PayUSOAPException ex) {

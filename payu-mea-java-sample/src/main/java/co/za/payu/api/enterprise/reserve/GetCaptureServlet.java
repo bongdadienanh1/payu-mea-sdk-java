@@ -47,10 +47,10 @@ public class GetCaptureServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse getCapture(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account1);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage createdPayment = (DoTransactionResponseMessage) reserveCapture(req, resp, apiContext, baseUrl);
 
@@ -82,8 +82,8 @@ public class GetCaptureServlet extends HttpServlet {
 
             LOGGER.info("Get captured/finalized payment details id = " + getTransactionResponseMessage.getPayUReference()
                     + " and result code = " + getTransactionResponseMessage.getResultCode());
-            ResultPrinter.addResult(req, resp, "Get Captured/Finalized Payment Details", JSONFormatter.toJSON(getTransaction),
-                    JSONFormatter.toJSON(getTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Get Captured/Finalized Payment Details", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Get Captured/Finalized Payment Details", JSONFormatter.toJSON(getTransaction),
                     JSONFormatter.toJSON(getTransactionResponseMessage), ex.getMessage());
@@ -157,8 +157,8 @@ public class GetCaptureServlet extends HttpServlet {
             LOGGER.info("Created reserve payment with id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
                     + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Create Authorized/Reserved Payment", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Create Authorized/Reserved Payment", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch(Exception ex) {
             ResultPrinter.addResult(req, resp, "Create Authorized/Reserved Payment. If Exception, " +
                             "check response for details.", JSONFormatter.toJSON(doTransaction),
@@ -171,7 +171,7 @@ public class GetCaptureServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse reserveCapture(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
 
-        DoTransactionResponseMessage createdReserve = (DoTransactionResponseMessage) createReservePayment(req, resp, apiContext, baseUrl);
+        DoTransactionResponseMessage createdReservePayment = (DoTransactionResponseMessage) createReservePayment(req, resp, apiContext, baseUrl);
 
         // ###CreditCard
         // A resource representing a credit card that can be
@@ -187,8 +187,8 @@ public class GetCaptureServlet extends HttpServlet {
 
         AdditionalInfo additionalInfo = objectFactory.createAdditionalInfo()
                 .setNotificationUrl(baseUrl+"return")
-                .setPayUReference(createdReserve.getPayUReference())
-                .setMerchantReference(createdReserve.getMerchantReference());
+                .setPayUReference(createdReservePayment.getPayUReference())
+                .setMerchantReference(createdReservePayment.getMerchantReference());
 
         // ###DoTransaction
         // A DoTransaction defines the Request payload of a
@@ -214,8 +214,10 @@ public class GetCaptureServlet extends HttpServlet {
 
             doTransactionResponseMessage = (DoTransactionResponseMessage) payment.capture(apiContext);
 
-            LOGGER.info("Capture reserved payment with id = " + doTransactionResponseMessage + " and status = ");
-            ResultPrinter.addResult(req, resp, "Capture/Finalize Reserved Payment", JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            LOGGER.info("Capture reserved payment with id = " + doTransactionResponseMessage.getPayUReference()
+                    + " and result code = " + doTransactionResponseMessage.getResultCode());
+            ResultPrinter.addResult(req, resp, "Capture/Finalize Reserved Payment", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Capture/Finalize Reserved Payment", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());

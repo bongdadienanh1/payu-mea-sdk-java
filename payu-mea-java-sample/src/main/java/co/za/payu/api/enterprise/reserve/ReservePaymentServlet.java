@@ -120,8 +120,8 @@ public class ReservePaymentServlet extends HttpServlet {
             LOGGER.info("Created authorize/reserve payment with id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
                     + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Authorize/Reserve Payment", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Authorize/Reserve Payment", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch(Exception ex) {
             ResultPrinter.addResult(req, resp, "Authorize/Reserve Payment. If Exception, " +
                             "check response for details.", JSONFormatter.toJSON(doTransaction),

@@ -47,10 +47,10 @@ public class RefundCaptureServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse refundCapture(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account1);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage createdPayment = (DoTransactionResponseMessage) reserveCapture(req, resp, apiContext, baseUrl);
 
@@ -93,8 +93,8 @@ public class RefundCaptureServlet extends HttpServlet {
 
             LOGGER.info("Refund captured/finalized payment with id = " + doTransactionResponseMessage.getPayUReference()
                     + " and result code = " + doTransactionResponseMessage.getResultCode());
-            ResultPrinter.addResult(req, resp, "Refund Captured/Finalized Payment", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Refund Captured/Finalized Payment", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Refund Captured/Finalized Payment", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());

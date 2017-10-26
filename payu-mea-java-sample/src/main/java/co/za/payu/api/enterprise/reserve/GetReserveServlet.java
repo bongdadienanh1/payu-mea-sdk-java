@@ -47,10 +47,10 @@ public class GetReserveServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse getReserve(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account1);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage createdReserve = (DoTransactionResponseMessage) createReservePayment(req, resp, apiContext, baseUrl);
 
@@ -156,8 +156,8 @@ public class GetReserveServlet extends HttpServlet {
             LOGGER.info("Created reserve payment with id = " + doTransactionResponseMessage.getPayUReference()
                     + " and result code = " + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Create Authorized/Reserved Payment", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Create Authorized/Reserved Payment", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch(Exception ex) {
             ResultPrinter.addResult(req, resp, "Create Authorized/Reserved Payment. If Exception, " +
                             "check response for details.", JSONFormatter.toJSON(doTransaction),

@@ -47,10 +47,10 @@ public class VoidReserveServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse voidReserve(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account1);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage createdReserve = (DoTransactionResponseMessage) createReservePayment(req, resp, apiContext, baseUrl);
 
@@ -143,7 +143,7 @@ public class VoidReserveServlet extends HttpServlet {
         // ###AdditionalInfo
         // A resource representing AdditionalInfo about the transaction
         AdditionalInfo additionalInfo = objectFactory.createAdditionalInfo()
-                .setNotificationUrl(baseUrl+"return")
+                .setNotificationUrl(baseUrl+"reserve/payment/return")
                 .setMerchantReference(UUID.randomUUID().toString())
                 .setStorePaymentMethod("true");
 
