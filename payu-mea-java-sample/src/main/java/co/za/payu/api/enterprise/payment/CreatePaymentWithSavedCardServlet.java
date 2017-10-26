@@ -49,17 +49,12 @@ public class CreatePaymentWithSavedCardServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse createPaymentWithSavedCard(HttpServletRequest req, HttpServletResponse resp) {
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+        String baseUrl = BaseSample.getBaseUrl(req);
 
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account7);
 
-        String baseUrl = BaseSample.getBaseUrl(req);
-
-        DoTransactionResponseMessage card = (DoTransactionResponseMessage) getCreditCard(req, resp, apiContext);
+        DoTransactionResponseMessage card = (DoTransactionResponseMessage) getCreditCard(req, resp, apiContext, baseUrl);
 
         String pmId = card.getPaymentMethodsUsed().get(0).getPmId();
 
@@ -117,8 +112,9 @@ public class CreatePaymentWithSavedCardServlet extends HttpServlet {
             doTransactionResponseMessage = (DoTransactionResponseMessage) payment.create(apiContext);
 
             LOGGER.info("Create payment using saved credit card with pmId = " + pmId
-                    + " and status = " + doTransactionResponseMessage.getResultCode());
-            ResultPrinter.addResult(req, resp, "Create Payment using Saved Credit Card", JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
+                    + " and result code = " + doTransactionResponseMessage.getResultCode());
+            ResultPrinter.addResult(req, resp, "Create Payment using Saved Credit Card", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Create Payment using Saved Credit Card", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());
@@ -127,9 +123,7 @@ public class CreatePaymentWithSavedCardServlet extends HttpServlet {
         return doTransactionResponseMessage;
     }
 
-    private IResponse getCreditCard(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext) {
-
-        String baseUrl = BaseSample.getBaseUrl(req);
+    private IResponse getCreditCard(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
 
         // ###CreditCard
         // A resource representing a credit card that can be
@@ -169,7 +163,7 @@ public class CreatePaymentWithSavedCardServlet extends HttpServlet {
         // ###AdditionalInfo
         // A resource representing AdditionalInfo about the transaction
         AdditionalInfo additionalInfo = objectFactory.createAdditionalInfo()
-                .setNotificationUrl(baseUrl+"return")
+                .setNotificationUrl(baseUrl + "reserve/payment/return")
                 .setMerchantReference(UUID.randomUUID().toString())
                 .setSupportedPaymentMethods("CREDITCARD")
                 .setStorePaymentMethod("true");
@@ -200,8 +194,8 @@ public class CreatePaymentWithSavedCardServlet extends HttpServlet {
             LOGGER.info("Created credit card id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
                     + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Create Payment and Save Credit Card", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Create Payment and Save Credit Card", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
 
         } catch(Exception ex) {
             ResultPrinter.addResult(req, resp, "Create Payment and Save Credit Card", JSONFormatter.toJSON(doTransactionResponseMessage),

@@ -47,10 +47,10 @@ public class CreatePaymentWithFraudManagementServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse createPaymentWithFraudManagement(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account3);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         // ###CreditCard
         // A resource representing a credit card that can be
@@ -65,8 +65,8 @@ public class CreatePaymentWithFraudManagementServlet extends HttpServlet {
 
         // ###ProductLineItem
         // A resource representing product line items. prices are in cents/integer
-        ProductLineItem productLineItem = objectFactory.createProductLineItem();
-        productLineItem.setRecipientFirstName("Joe")
+        ProductLineItem productLineItem = objectFactory.createProductLineItem()
+                .setRecipientFirstName("Joe")
                 .setRecipientLastName("Shopper")
                 .setRecipientEmail("approve@test.com")
                 .setRecipientPhone("27827777777")
@@ -169,7 +169,7 @@ public class CreatePaymentWithFraudManagementServlet extends HttpServlet {
             LOGGER.info("Created payment with id = " + doTransactionResponseMessage.getPayUReference() +
                     " and status = " + doTransactionResponseMessage.getResultCode());
             ResultPrinter.addResult(req, resp, "Create Payment with Fraud Management",
-                    JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
+                    Payment.getLastRequest(), Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Create Payment with Fraud Management. If Exception, " +
                             "check response for details.", JSONFormatter.toJSON(doTransaction),

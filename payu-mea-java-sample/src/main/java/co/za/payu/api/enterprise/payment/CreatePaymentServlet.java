@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import co.za.payu.api.IResponse;
 import co.za.payu.api.Payment;
 import co.za.payu.api.redirect.BaseSample;
+import co.za.payu.base.exception.PayUSOAPException;
 import co.za.payu.base.soap.APIContext;
 import co.za.payu.base.soap.JSONFormatter;
 import co.za.payu.util.SampleConstants;
@@ -46,11 +47,6 @@ public class CreatePaymentServlet extends HttpServlet {
     }
 
     private IResponse createPayment(HttpServletRequest req, HttpServletResponse resp) {
-
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
 
         String baseUrl = BaseSample.getBaseUrl(req);
 
@@ -117,9 +113,9 @@ public class CreatePaymentServlet extends HttpServlet {
             LOGGER.info("Created payment with id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
                     + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Payment with Credit Card", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
-        } catch(Exception ex) {
+            ResultPrinter.addResult(req, resp, "Payment with Credit Card", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
+        } catch(PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Payment with Credit Card. If Exception, " +
                             "check response for details.", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());

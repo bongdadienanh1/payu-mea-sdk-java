@@ -36,7 +36,7 @@ public class CreatePaymentRealTimeRecurringServlet extends HttpServlet {
 
     // ##Create
     // Sample showing to create a Payment using
-    // CreditCard as a FundingInstrument
+    // CreditCard as a Real Time Recurring payment
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -48,15 +48,10 @@ public class CreatePaymentRealTimeRecurringServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse createPaymentRealTimeRecurring(HttpServletRequest req, HttpServletResponse resp) {
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+        String baseUrl = BaseSample.getBaseUrl(req);
 
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account7);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage card = (DoTransactionResponseMessage) setupRealTimeRecurring(req, resp, apiContext, baseUrl);
 
@@ -204,11 +199,11 @@ public class CreatePaymentRealTimeRecurringServlet extends HttpServlet {
             LOGGER.info("Setup real-time recurring, id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
                     + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Setup Real-Time Recurring", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Setup Real-Time Recurring", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
 
         } catch(Exception ex) {
-            ResultPrinter.addResult(req, resp, "Setup Real-Time Recurring", JSONFormatter.toJSON(doTransactionResponseMessage),
+            ResultPrinter.addResult(req, resp, "Setup Real-Time Recurring", Payment.getLastRequest(),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());
         }
 

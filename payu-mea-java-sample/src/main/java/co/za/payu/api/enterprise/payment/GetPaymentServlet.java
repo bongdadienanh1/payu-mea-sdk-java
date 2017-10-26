@@ -1,6 +1,7 @@
 package co.za.payu.api.enterprise.payment;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,10 +48,10 @@ public class GetPaymentServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse getPayment(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account7);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         DoTransactionResponseMessage createdPayment = (DoTransactionResponseMessage) createPayment(req, resp, apiContext, baseUrl);
 
@@ -62,7 +63,7 @@ public class GetPaymentServlet extends HttpServlet {
         // ###GetTransaction
         // A GetTransaction defines the Request payload to get
         // payment details - GetTransaction is created with
-        // a payment id/reference
+        // a `payUReference`
         GetTransaction getTransaction = objectFactory.createGetTransaction()
                 .setAdditionalInformation(additionalInfo);
 
@@ -92,7 +93,7 @@ public class GetPaymentServlet extends HttpServlet {
         return getTransactionResponseMessage;
     }
 
-    public IResponse createPayment(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
+    private IResponse createPayment(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
         // ###CreditCard
         // A resource representing a credit card that can be
         // used to fund a payment.
@@ -111,8 +112,8 @@ public class GetPaymentServlet extends HttpServlet {
         productLineItem1.setDescription("Ground Coffee 40 oz")
                 .setSku("GCF0011")
                 .setQuantity("10")
-                .setCostAmount("75")
-                .setAmount("750");
+                .setCostAmount("750")
+                .setAmount("7500");
         productLineItem2.setDescription("Granola Bars with Peanuts")
                 .setSku("GCF0022")
                 .setQuantity("5")
@@ -148,7 +149,7 @@ public class GetPaymentServlet extends HttpServlet {
 
         AdditionalInfo additionalInfo = objectFactory.createAdditionalInfo()
                 .setNotificationUrl(baseUrl + "reserve/payment/return")
-                .setMerchantReference("unique-id");
+                .setMerchantReference(UUID.randomUUID().toString());
 
         // ###DoTransaction
         // A DoTransaction defines the Request payload of a
@@ -175,9 +176,10 @@ public class GetPaymentServlet extends HttpServlet {
 
             doTransactionResponseMessage = (DoTransactionResponseMessage) payment.create(apiContext);
 
-            LOGGER.info("Created payment with id = " + doTransactionResponseMessage + " and status = ");
+            LOGGER.info("Created payment with id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
+                    + doTransactionResponseMessage.getResultCode());
             ResultPrinter.addResult(req, resp, "Create Payment With Credit Card",
-                    JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
+                    Payment.getLastRequest(), Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Create Payment With Credit Card. If 500 Exception, check " +
                             "response details", JSONFormatter.toJSON(doTransaction),

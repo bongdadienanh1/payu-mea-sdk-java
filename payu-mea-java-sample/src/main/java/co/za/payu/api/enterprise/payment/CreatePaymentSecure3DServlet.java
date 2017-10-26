@@ -3,6 +3,7 @@ package co.za.payu.api.enterprise.payment;
 import co.za.payu.api.IResponse;
 import co.za.payu.api.Payment;
 import co.za.payu.api.redirect.BaseSample;
+import co.za.payu.base.exception.PayUSOAPException;
 import co.za.payu.base.soap.APIContext;
 import co.za.payu.base.soap.JSONFormatter;
 import co.za.payu.util.ResultPrinter;
@@ -45,11 +46,6 @@ public class CreatePaymentSecure3DServlet extends HttpServlet {
     }
 
     private IResponse createPaymentSecure3D(HttpServletRequest req, HttpServletResponse resp) {
-
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
 
         String baseUrl = BaseSample.getBaseUrl(req);
 
@@ -117,9 +113,9 @@ public class CreatePaymentSecure3DServlet extends HttpServlet {
             LOGGER.info("Created payment secure3D with id = " + doTransactionResponseMessage.getPayUReference() + " and result code = "
                     + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Create Payment Using Credit Card with Secure3D", JSONFormatter.toJSON(doTransaction),
-                    JSONFormatter.toJSON(doTransactionResponseMessage), null);
-        } catch(Exception ex) {
+            ResultPrinter.addResult(req, resp, "Create Payment Using Credit Card with Secure3D", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
+        } catch(PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Create Payment Using Credit Card with Secure3D", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());
         }
