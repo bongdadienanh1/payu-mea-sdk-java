@@ -198,17 +198,14 @@ pre .id {
 </head>
 <body>
 	<%
-		List<String> responses = (List<String>) request
-				.getAttribute("responses");
-		List<String> requests = (List<String>) request
-				.getAttribute("requests");
-		List<String> messages = (List<String>) request
-				.getAttribute("messages");
+		List<String> responses = (List<String>) request.getAttribute("responses");
+		List<String> requests = (List<String>) request.getAttribute("requests");
+		List<String> messages = (List<String>) request.getAttribute("messages");
 		List<String> errors = (List<String>) request.getAttribute("errors");
 	%>
 	<div class="row header">
 		<div class="col-md-5 pull-left">
-			<br /> <a href="index.html"><h1 class="home">&#10094;&#10094;
+			<br /> <a href="../../index.html"><h1 class="home">&#10094;&#10094;
 					Back to Samples</h1></a><br />
 		</div>
 		<br />
@@ -245,7 +242,7 @@ pre .id {
 	%>
 					<div>
 						<a href=<%=(String) request.getAttribute("redirectURL")%>>Redirect
-							to PaU to capture payment details</a>
+							to PayU to capture payment details</a>
 					</div>
 					<%
 		}

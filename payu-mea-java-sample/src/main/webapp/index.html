@@ -41,7 +41,9 @@
         }
 
         li.list-group-item:hover {
-            background-color: #EEE;
+            color: #ffffff;
+            font-weight: bold;
+            background-color: #80AF14;
         }
 
         .jumbotron{
@@ -129,7 +131,7 @@
         }
 
         .footer-links a {
-            color: #428bca;
+            color: #80AF14;
         ;
         }
 
@@ -155,10 +157,10 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-3 pull-left img-div">
-                <img src="https://static.payu.co.za/sites/all/themes/regionwithwalletNew/public/images/global/payu@2x.png" class="logo img-responsive"/>
+                <img src="https://www.payu.co.za/sites/all/themes/regionwithwalletNew/public/images/global/payu%402x.png" class="logo img-responsive"/>
             </div>
             <div class="col-md-9 pull-right">
-                <h2>// SOAP API Samples</h2>
+                <h2>// Enterprise/Redirect API Samples</h2>
 
                 <p>These examples are created to experiment with the PayU-MEA-Java-SDK capabilities. Each examples
                     are designed to demonstrate the default use-cases in each segment.</p>
@@ -190,7 +192,12 @@
         <div class="col-md-3 ">
             <div class="row-fluid fixed col-md-3" id="leftNavigation" role="navigation">
                 <ul class="nav nav-pills nav-stacked">
-                    <li><a href="#payments">Payments</a></li>
+                    <li><a href="#enterprise-payment">Payment (Enterprise API)</a></li>
+                    <li><a href="#enterprise-reserve">Authorization/Capture (Enterprise API)</a></li>
+                    <li><a href="#redirect-payment">Payment (Redirect API)</a></li>
+                    <li><a href="#redirect-reserve">Authorization/Capture (Redirect API)</a></li>
+                    <li><a href="#lookup">Lookup Transactions</a></li>
+                    <li><a href="#partner-api">Partner API</a></li>
                 </ul>
 
             </div>
@@ -198,24 +205,356 @@
         <div class="col-md-9 samples">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    <h3 id="payments" class="panel-title"><a
+                    <h3 id="enterprise-payment" class="panel-title"><a
                             href="#"
-                            target="_blank">Payments</a></h3>
+                            target="_blank">Payment (Enterprise API)</a></h3>
                 </div>
                 <!-- List group -->
                 <ul class="list-group">
                     <li class="list-group-item">
                         <div class="row">
-                            <div class="col-md-8"><h5>PayPal Payments - similar to Express Checkout in Classic APIs</small></h5>
+                            <div class="col-md-8"><h5>Payment using credit card</small></h5>
                             </div>
                             <div class="col-md-4">
-                                <a href="paymentwithcreditcard" class="btn btn-primary pull-left execute">
+                                <a href="enterprise/payment/create-payment" class="btn btn-primary pull-left execute">
                                     Try It
                                     <i class="fa fa-play-circle-o"></i></a><a
-                                    href="source/enterprise/payment/servlet/PaymentWithCreditCardServlet.html"
+                                    href="source/enterprise/payment/CreatePaymentServlet.html"
                                     class="btn btn-default pull-right">Source <i
                                         class="fa fa-file-code-o"></i></a>
 
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Payment using credit card
+                                    <small>(secure3D)</small>
+                                </h5>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="enterprise/payment/create-payment-secure3d" class="btn btn-primary pull-left execute">
+                                    Try It <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/payment/CreatePaymentSecure3DServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Payment using saved credit card
+                                    <small>(using Payment method ID - pmId)</small>
+                                </h5>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="enterprise/payment/create-payment-with-saved-card" class="btn btn-primary pull-left execute">
+                                    Try It <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/payment/CreatePaymentWithSavedCardServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5>Real-Time Recurring Credit Card Transactions (RTR)
+                                    <small></small>
+                                </h5>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="enterprise/payment/create-payment-real-time-recurring" class="btn btn-primary pull-left execute">
+                                    Try It <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/payment/CreatePaymentRealTimeRecurringServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Debit Order</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/payment/create-debit-order" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/payment/CreateDebitOrderServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Payment with fraud management</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/payment/create-payment-with-fraud-management" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/payment/CreatePaymentWithFraudManagementServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get a payment details</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/payment/get-payment" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/payment/GetPaymentServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="enterprise-reserve" class="panel-title"><a
+                            href="#"
+                            target="_blank">Authorize and Capture (Enterprise API)</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Reserve Payment</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/reserve/reserve-payment" class="btn btn-primary pull-left execute"> Try
+                                    It<i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/reserve/ReservePaymentServlet.html" class="btn btn-default pull-right">Source
+                                    <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get details of a reserved payment</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/reserve/get-reserve" class="btn btn-primary pull-left execute"> Try
+                                    It<i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/reserve/GetReserveServlet.html" class="btn btn-default pull-right">Source
+                                    <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Finalize a reserved payment</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/reserve/reserve-capture" class="btn btn-primary pull-left execute">
+                                    Try It <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/reserve/ReserveCaptureServlet.html" class="btn btn-default pull-right">Source
+                                    <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get details of a finalized payment</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/reserve/get-capture" class="btn btn-primary pull-left execute"> Try It <i
+                                        class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/reserve/GetCaptureServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Void a reserved payment</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/reserve/void-reserve" class="btn btn-primary pull-left execute"> Try
+                                    It<i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/reserve/VoidReserveServlet.html" class="btn btn-default pull-right">Source
+                                    <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Credit finalized payment</h5></div>
+                            <div class="col-md-4">
+                                <a href="enterprise/reserve/refund-capture" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/enterprise/reserve/RefundCaptureServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="redirect-payment" class="panel-title"><a
+                            href="#"
+                            target="_blank">Payment (Redirect API)</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Standard Redirect
+                                <small>Credit card, eBucks, and Discovery Miles</small>
+                            </h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/payment/standard-redirect" class="btn btn-primary pull-left execute"> Try It
+                                    <i
+                                            class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/payment/StandardRedirectServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Payment using credit card (secure3D)</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/payment/setup-payment-secure3d" class="btn btn-primary pull-left execute"> Try It
+                                    <i
+                                            class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/payment/SetupPaymentSecure3D.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get a payment details</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/payment/get-redirect" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/payment/GetRedirectServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Standard payment with fraud management</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/payment/standard-redirect-with-fraud-management" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/payment/StandardRedirectWithFraudManagementServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Debit Order</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/payment/setup-debit-order" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/payment/SetupDebitOrderServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Real-Time Recurring</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/payment/setup-real-time-recurring" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/payment/SetupRealTimeRecurringServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="redirect-reserve" class="panel-title"><a
+                            href="#"
+                            target="_blank">Authorization/Capture (Redirect API)</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Standard Redirect</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/reserve/standard-redirect" class="btn btn-primary pull-left execute"> Try It
+                                    <i
+                                            class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/reserve/StandardRedirectServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get a redirect reserve details</h5></div>
+                            <div class="col-md-4">
+                                <a href="redirect/reserve/get-redirect" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/redirect/reserve/GetRedirectServlet.html" class="btn btn-default pull-right">Source <i
+                                        class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="lookup" class="panel-title"><a href="#" target="_blank">Lookup Transactions</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Get a user's payment methods</h5></div>
+                            <div class="col-md-4">
+                                <a href="lookup/customer/get-payment-method" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/lookup/customer/LookupGetPaymentMethodServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 id="partner-api" class="panel-title"><a href="#" target="_blank">Partner API</a></h3>
+                </div>
+                <!-- List group -->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>eBucks Authenticate Account (Enterprise API)</h5></div>
+                            <div class="col-md-4">
+                                <a href="partner-api/ebucks/ebucks-authenticate-account" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/partner-api/ebucks/EbucksAuthenticateAccountServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>eBucks Generate OTP (Enterprise API)</h5></div>
+                            <div class="col-md-4">
+                                <a href="partner-api/ebucks/ebucks-generate-otp" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/partner-api/ebucks/EbucksGenerateOTPServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>EFT Pro Payment (Enterprise API)</h5></div>
+                            <div class="col-md-4">
+                                <a href="partner-api/eft/eft-payment" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/partner-api/eft/EFTPaymentServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-8"><h5>Smart EFT Payment (Enterprise API)</h5></div>
+                            <div class="col-md-4">
+                                <a href="partner-api/eft/smart-eft-payment" class="btn btn-primary pull-left execute"> Try It
+                                    <i class="fa fa-play-circle-o"></i></a>
+                                <a href="source/partner-api/eft/SmartEFTPaymentServlet.html" class="btn btn-default pull-right">Source <i class="fa fa-file-code-o"></i></a>
                             </div>
                         </div>
                     </li>

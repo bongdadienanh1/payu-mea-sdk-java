@@ -9,13 +9,253 @@
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
+	<!-- Payment (Enterprise API) -->
 	<servlet>
-		<servlet-name>PaymentWithCreditCardServlet</servlet-name>
-		<servlet-class>co.za.payu.api.enterprise.servlet.PaymentWithCreditCardServlet</servlet-class>
+		<servlet-name>CreatePaymentServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.CreatePaymentServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>PaymentWithCreditCardServlet</servlet-name>
-		<url-pattern>/paymentwithcreditcard</url-pattern>
+		<servlet-name>CreatePaymentServlet</servlet-name>
+		<url-pattern>/enterprise/payment/create-payment</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreatePaymentSecure3d</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.CreatePaymentSecure3DServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CreatePaymentSecure3d</servlet-name>
+		<url-pattern>/enterprise/payment/create-payment-secure3d</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreatePaymentWithSavedCardServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.CreatePaymentWithSavedCardServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CreatePaymentWithSavedCardServlet</servlet-name>
+		<url-pattern>/enterprise/payment/create-payment-with-saved-card</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreatePaymentRealTimeRecurringServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.CreatePaymentRealTimeRecurringServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CreatePaymentRealTimeRecurringServlet</servlet-name>
+		<url-pattern>/enterprise/payment/create-payment-real-time-recurring</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreateDebitOrderServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.CreateDebitOrderServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CreateDebitOrderServlet</servlet-name>
+		<url-pattern>/enterprise/payment/create-debit-order</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CreatePaymentWithFraudManagementServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.CreatePaymentWithFraudManagementServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CreatePaymentWithFraudManagementServlet</servlet-name>
+		<url-pattern>/enterprise/payment/create-payment-with-fraud-management</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>GetPaymentServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.payment.GetPaymentServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetPaymentServlet</servlet-name>
+		<url-pattern>/enterprise/payment/get-payment</url-pattern>
+	</servlet-mapping>
+
+	<!-- Authorize and Capture (Enterprise API) -->
+	<servlet>
+		<servlet-name>ReservePaymentServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.reserve.ReservePaymentServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReservePaymentServlet</servlet-name>
+		<url-pattern>/enterprise/reserve/reserve-payment</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>GetReserveServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.reserve.GetReserveServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetReserveServlet</servlet-name>
+		<url-pattern>/enterprise/reserve/get-reserve</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ReserveCaptureServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.reserve.ReserveCaptureServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ReserveCaptureServlet</servlet-name>
+		<url-pattern>/enterprise/reserve/reserve-capture</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>GetCaptureServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.reserve.GetCaptureServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetCaptureServlet</servlet-name>
+		<url-pattern>/enterprise/reserve/get-capture</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>VoidReserveServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.reserve.VoidReserveServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>VoidReserveServlet</servlet-name>
+		<url-pattern>/enterprise/reserve/void-reserve</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RefundCaptureServlet</servlet-name>
+		<servlet-class>co.za.payu.api.enterprise.reserve.RefundCaptureServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RefundCaptureServlet</servlet-name>
+		<url-pattern>/enterprise/reserve/refund-capture</url-pattern>
+	</servlet-mapping>
+
+	<!-- Payment (Redirect API) -->
+	<servlet>
+		<servlet-name>StandardRedirectServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.payment.StandardRedirectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StandardRedirectServlet</servlet-name>
+		<url-pattern>/redirect/payment/standard-redirect</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>SetupPaymentSecure3DServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.payment.SetupPaymentSecure3DServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SetupPaymentSecure3DServlet</servlet-name>
+		<url-pattern>/redirect/payment/setup-payment-secure3d</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>GetRedirectServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.payment.GetRedirectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetRedirectServlet</servlet-name>
+		<url-pattern>/redirect/payment/get-redirect</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>StandardRedirectWithFraudManagementServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.payment.StandardRedirectWithFraudManagementServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StandardRedirectWithFraudManagementServlet</servlet-name>
+		<url-pattern>/redirect/payment/standard-redirect-with-fraud-management</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>SetupDebitOrderServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.payment.SetupDebitOrderServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SetupDebitOrderServlet</servlet-name>
+		<url-pattern>/redirect/payment/setup-debit-order</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>SetupRealTimeRecurringServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.payment.SetupRealTimeRecurringServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SetupRealTimeRecurringServlet</servlet-name>
+		<url-pattern>/redirect/payment/setup-real-time-recurring</url-pattern>
+	</servlet-mapping>
+
+	<!-- Authorization/Capture (Redirect API) -->
+	<servlet>
+		<servlet-name>StandardRedirectReserveServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.reserve.StandardRedirectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StandardRedirectReserveServlet</servlet-name>
+		<url-pattern>/redirect/reserve/standard-redirect</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>GetRedirectReserveServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.reserve.GetRedirectServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetRedirectReserveServlet</servlet-name>
+		<url-pattern>/redirect/reserve/get-redirect</url-pattern>
+	</servlet-mapping>
+
+	<!-- Lookup API -->
+	<servlet>
+		<servlet-name>LookupGetPaymentMethodServlet</servlet-name>
+		<servlet-class>co.za.payu.api.lookup.customer.LookupGetPaymentMethodServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>LookupGetPaymentMethodServlet</servlet-name>
+		<url-pattern>/lookup/customer/get-payment-method</url-pattern>
+	</servlet-mapping>
+
+	<!-- Partner API -->
+	<servlet>
+		<servlet-name>EbucksAuthenticateAccountServlet</servlet-name>
+		<servlet-class>co.za.payu.api.partnerapi.ebucks.EbucksAuthenticateAccountServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>EbucksAuthenticateAccountServlet</servlet-name>
+		<url-pattern>/partner-api/ebucks/ebucks-authenticate-account</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>EbucksPaymentServlet</servlet-name>
+		<servlet-class>co.za.payu.api.partnerapi.ebucks.EbucksGenerateOTPServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>EbucksPaymentServlet</servlet-name>
+		<url-pattern>/partner-api/ebucks/ebucks-generate-otp</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>EFTPaymentServlet</servlet-name>
+		<servlet-class>co.za.payu.api.partnerapi.eft.EFTProPaymentServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>EFTPaymentServlet</servlet-name>
+		<url-pattern>/partner-api/eft/eft-payment</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>SmartEFTPaymentServlet</servlet-name>
+		<servlet-class>co.za.payu.api.partnerapi.eft.SmartEFTPaymentServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SmartEFTPaymentServlet</servlet-name>
+		<url-pattern>/partner-api/eft/smart-eft-payment</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>RedirectPaymentReturnServlet</servlet-name>
+		<servlet-class>co.za.payu.api.redirect.RedirectPaymentReturnServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RedirectPaymentReturnServlet</servlet-name>
+		<url-pattern>/reserve/payment/return</url-pattern>
 	</servlet-mapping>
 
 </web-app>

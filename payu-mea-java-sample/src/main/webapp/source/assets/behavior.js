@@ -8,16 +8,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     {
       "type": "folder",
       "data": {
-        "path": "payments",
-        "title": "payments"
+        "path": "enterprise",
+        "title": "enterprise"
       },
       "depth": 1,
       "children": [
         {
           "type": "folder",
           "data": {
-            "path": "payments/servlet",
-            "title": "servlet"
+            "path": "enterprise/payment",
+            "title": "payment"
           },
           "depth": 2,
           "children": [
@@ -33,11 +33,11 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "foldPrefix": "^",
                   "name": "Java"
                 },
-                "sourcePath": "/Users/japatel/Documents/workspace/paypal/PayPal-Java-SDK/rest-api-sample/src/main/java/com/paypal/api/payments/servlet/AuthorizationCaptureServlet.java",
-                "projectPath": "payments/servlet/AuthorizationCaptureServlet.java",
-                "targetPath": "payments/servlet/AuthorizationCaptureServlet",
-                "pageTitle": "payments/servlet/AuthorizationCaptureServlet",
-                "title": "AuthorizationCaptureServlet"
+                "sourcePath": "/home/kenny/payu-dev/payu-mea-sdk/Java/payu-sdk-java/payu-mea-java-sample/src/main/co/za/payu/api/enterprise/payment/CreateDebitOrderServlet.java",
+                "projectPath": "enterprise/payment/CreateDebitOrderServlet.java",
+                "targetPath": "enterprise/payment/CreateDebitOrderServlet",
+                "pageTitle": "enterprise/payment/CreateDebitOrderServlet",
+                "title": "CreateDebitOrderServlet"
               },
               "depth": 3
             }, {
