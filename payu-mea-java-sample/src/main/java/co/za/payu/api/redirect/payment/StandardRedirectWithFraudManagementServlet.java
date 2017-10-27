@@ -112,8 +112,8 @@ public class StandardRedirectWithFraudManagementServlet extends HttpServlet {
                 .setAddressCity("Cape Town")
                 .setStateCode("WC")
                 .setPostCode("8000")
-                .setCountryOfResidence("ZAF")
-                .setCountryCode("27");
+                .setCountryCode("27")
+                .setCountryOfResidence("ZAF");
 
         // ###Fraud
         // A resource representing Fraud management details
@@ -162,7 +162,7 @@ public class StandardRedirectWithFraudManagementServlet extends HttpServlet {
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment With Fraud Management.",
-                    JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), null);
+                    Redirect.getLastRequest(), Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment With Fraud Management. If Exception, check response details",
                     JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());

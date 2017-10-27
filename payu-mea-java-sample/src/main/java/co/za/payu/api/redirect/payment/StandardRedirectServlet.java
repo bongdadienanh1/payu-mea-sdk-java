@@ -113,7 +113,7 @@ public class StandardRedirectServlet extends HttpServlet {
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment.",
-                    JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), null);
+                    Redirect.getLastResponse(), Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment. If Exception, check response details",
                     JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());

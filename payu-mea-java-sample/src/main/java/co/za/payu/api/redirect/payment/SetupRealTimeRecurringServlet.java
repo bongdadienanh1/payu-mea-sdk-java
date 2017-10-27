@@ -49,11 +49,6 @@ public class SetupRealTimeRecurringServlet extends HttpServlet {
 
         String baseUrl = BaseSample.getBaseUrl(req);
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
-
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account5);
 
@@ -78,7 +73,8 @@ public class SetupRealTimeRecurringServlet extends HttpServlet {
                 .setAddress2("Cape Town")
                 .setAddressCity("Cape Town")
                 .setStateCode("WC")
-                .setPostCode("2000");
+                .setPostCode("2000")
+                .setCountryOfResidence("ZAF");
 
         // ###AdditionalInfo
         // A resource representing AdditionalInfo about the transaction
@@ -91,7 +87,7 @@ public class SetupRealTimeRecurringServlet extends HttpServlet {
                 .setSecure3D("true");
 
         // ###TransactionRecord
-        // A resource representing a debit order transaction record
+        // A resource representing a transaction record information
         TransactionRecord transactionRecord = objectFactory.createTransactionRecord()
                 .setRecurrences("6")
                 .setStartDate("2014/07/26")
@@ -138,7 +134,7 @@ public class SetupRealTimeRecurringServlet extends HttpServlet {
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
             ResultPrinter.addResult(req, resp, "Setup Real Time Recurring Payment.",
-                    JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), null);
+                    Redirect.getLastRequest(), Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Setup Real Time Recurring Payment. If Exception, check response details",
                     JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());

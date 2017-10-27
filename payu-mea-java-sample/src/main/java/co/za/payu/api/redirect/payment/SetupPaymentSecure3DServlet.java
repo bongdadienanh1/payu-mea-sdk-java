@@ -115,7 +115,7 @@ public class SetupPaymentSecure3DServlet extends HttpServlet {
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment with Secure3D.",
-                    JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), null);
+                    Redirect.getLastRequest(), Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment with Secure3D. If Exception, check response details",
                     JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());

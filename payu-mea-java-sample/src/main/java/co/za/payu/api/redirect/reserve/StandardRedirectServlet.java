@@ -47,10 +47,10 @@ public class StandardRedirectServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse standardRedirect(HttpServletRequest req, HttpServletResponse resp) {
 
+        String baseUrl = BaseSample.getBaseUrl(req);
+
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account2);
-
-        String baseUrl = BaseSample.getBaseUrl(req);
 
         // ###Basket
         // A resource representing a Basket/Cart belonging to a customer
@@ -113,7 +113,7 @@ public class StandardRedirectServlet extends HttpServlet {
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment.",
-                    JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), null);
+                    Redirect.getLastRequest(), Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Setup Redirect Payment. If Exception, check response details",
                     JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());

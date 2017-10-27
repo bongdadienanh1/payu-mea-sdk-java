@@ -40,22 +40,19 @@ public class GetRedirectServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        getRedirectServlet(req, resp);
+        getRedirect(req, resp);
         req.getRequestDispatcher("../../response.jsp").forward(req, resp);
     }
 
     @SuppressWarnings("Duplicates")
-    private IResponse getRedirectServlet(HttpServletRequest req, HttpServletResponse resp) {
+    private IResponse getRedirect(HttpServletRequest req, HttpServletResponse resp) {
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+        String baseUrl = BaseSample.getBaseUrl(req);
 
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account2);
 
-        SetTransactionResponseMessage createdRedirect = (SetTransactionResponseMessage) setupStandardRedirect(req, resp, apiContext);
+        SetTransactionResponseMessage createdRedirect = (SetTransactionResponseMessage) setupStandardRedirect(req, resp, apiContext, baseUrl);
 
         AdditionalInfo additionalInfo = objectFactory.createAdditionalInfo()
                 .setPayUReference(createdRedirect.getPayUReference());
@@ -70,7 +67,7 @@ public class GetRedirectServlet extends HttpServlet {
 
         // ###Payment
         // A Payment Resource
-        co.za.payu.api.Redirect redirect= new co.za.payu.api.Redirect();
+        Redirect redirect= new Redirect();
         redirect.setRequest(getTransaction);
 
         GetTransactionResponseMessage getTransactionResponseMessage = null;
@@ -91,9 +88,8 @@ public class GetRedirectServlet extends HttpServlet {
         return getTransactionResponseMessage;
     }
 
-    private IResponse setupStandardRedirect(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext) {
-
-        String baseUrl = BaseSample.getBaseUrl(req);
+    @SuppressWarnings("Duplicates")
+    private IResponse setupStandardRedirect(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
 
         // ###Basket
         // A resource representing a Basket/Cart belonging to a customer
@@ -131,7 +127,7 @@ public class GetRedirectServlet extends HttpServlet {
         // payment redirect - SetTransaction is created with
         // a `Customer`, `Basket`, and other types
         SetTransaction setTransaction = objectFactory.createSetTransaction()
-                .setTransactionType(TransactionType.PAYMENT)
+                .setTransactionType(TransactionType.RESERVE)
                 .setAdditionalInformation(additionalInfo)
                 .setBasket(basket)
                 .setCustomer(customer);
@@ -155,10 +151,10 @@ public class GetRedirectServlet extends HttpServlet {
 
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
-            ResultPrinter.addResult(req, resp, "Setup Authorize/Reserve Redirect Payment", JSONFormatter.toJSON(setTransaction),
+            ResultPrinter.addResult(req, resp, "Setup Redirect Payment", JSONFormatter.toJSON(setTransaction),
                     JSONFormatter.toJSON(setTransactionResponseMessage), null);
         } catch (PayUSOAPException ex) {
-            ResultPrinter.addResult(req, resp, "Setup Authorize/Reserve Redirect Payment. If Exception, check response details",
+            ResultPrinter.addResult(req, resp, "Setup Redirect Payment. If Exception, check response details",
                     JSONFormatter.toJSON(setTransaction), JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());
         }
 

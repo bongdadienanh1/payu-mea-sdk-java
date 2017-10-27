@@ -47,15 +47,12 @@ public class GetRedirectServlet extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private IResponse getRedirect(HttpServletRequest req, HttpServletResponse resp) {
 
-        System.setProperty("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.client.HttpTransportPipe.dump", "true");
-        System.setProperty("com.sun.xml.ws.transport.http.HttpAdapter.dump", "true");
-        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+        String baseUrl = BaseSample.getBaseUrl(req);
 
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account2);
 
-        SetTransactionResponseMessage createdRedirect = (SetTransactionResponseMessage) setupStandardRedirect(req, resp, apiContext);
+        SetTransactionResponseMessage createdRedirect = (SetTransactionResponseMessage) setupStandardRedirect(req, resp, apiContext, baseUrl);
 
         AdditionalInfo additionalInfo = objectFactory.createAdditionalInfo()
                 .setPayUReference(createdRedirect.getPayUReference());
@@ -94,9 +91,8 @@ public class GetRedirectServlet extends HttpServlet {
         return getTransactionResponseMessage;
     }
 
-    private IResponse setupStandardRedirect(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext) {
-
-        String baseUrl = BaseSample.getBaseUrl(req);
+    @SuppressWarnings("Duplicates")
+    private IResponse setupStandardRedirect(HttpServletRequest req, HttpServletResponse resp, APIContext apiContext, String baseUrl) {
 
         // ###Basket
         // A resource representing a Basket/Cart belonging to a customer
