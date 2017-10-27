@@ -20,7 +20,7 @@ dependencies {
 ```
 
 ## Get Started
-- [Run Samples project](rest-api-sample).
+- [Run Samples project](payu-mea-java-sample).
 
 License
 --------------------
