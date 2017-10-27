@@ -58,6 +58,7 @@ public class SmartEFTPaymentServlet extends HttpServlet {
         banks.add(SmartEFT.FNB);
         banks.add(SmartEFT.NEDBANK);
         banks.add(SmartEFT.STANDARD_BANK);
+        Collections.shuffle(banks);
 
         APIContext apiContext = new APIContext(SampleConstants.apiUsername, SampleConstants.apiPassword,
                 SampleConstants.safeKey, SampleConstants.mode, SampleConstants.account2);
@@ -127,7 +128,8 @@ public class SmartEFTPaymentServlet extends HttpServlet {
             LOGGER.info("Create payment using smart EFT with id = " + doTransactionResponseMessage.getPayUReference()
                     + " and result code = " + doTransactionResponseMessage.getResultCode());
 
-            ResultPrinter.addResult(req, resp, "Create Payment Using Smart EFT", JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Create Payment Using Smart EFT", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Create Payment Using Smart EFT", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());

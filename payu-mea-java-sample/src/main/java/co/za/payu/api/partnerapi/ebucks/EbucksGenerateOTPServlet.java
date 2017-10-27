@@ -125,16 +125,16 @@ public class EbucksGenerateOTPServlet extends HttpServlet {
 
             setTransactionResponseMessage = (SetTransactionResponseMessage) redirect.setup(apiContext);
 
-            LOGGER.info("Created payment with id = " + setTransactionResponseMessage.getPayUReference()
+            LOGGER.info("eBucks generate OTP with id = " + setTransactionResponseMessage.getPayUReference()
                     + " and result code = " + setTransactionResponseMessage.getResultCode());
 
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
-            ResultPrinter.addResult(req, resp, "eBucks Payment Authentication",
-                    JSONFormatter.toJSON(setTransaction),
-                    JSONFormatter.toJSON(setTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "eBucks Generate OTP",
+                    Redirect.getLastRequest(),
+                    Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
-            ResultPrinter.addResult(req, resp, "eBucks Payment Authentication",
+            ResultPrinter.addResult(req, resp, "eBucks Generate OTP",
                     JSONFormatter.toJSON(setTransaction),
                     JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());
         }

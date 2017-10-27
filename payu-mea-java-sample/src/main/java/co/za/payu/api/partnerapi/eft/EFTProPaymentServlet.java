@@ -121,7 +121,8 @@ public class EFTProPaymentServlet extends HttpServlet {
 
             req.setAttribute("redirectURL", doTransactionResponseMessage.getRedirect().getUrl());
 
-            ResultPrinter.addResult(req, resp, "Create Payment Using EFT Pro", JSONFormatter.toJSON(doTransaction), JSONFormatter.toJSON(doTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "Create Payment Using EFT Pro", Payment.getLastRequest(),
+                    Payment.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
             ResultPrinter.addResult(req, resp, "Create Payment Using EFT Pro", JSONFormatter.toJSON(doTransaction),
                     JSONFormatter.toJSON(doTransactionResponseMessage), ex.getMessage());

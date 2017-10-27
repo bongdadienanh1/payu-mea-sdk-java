@@ -110,7 +110,7 @@ public class EbucksAuthenticateAccountServlet extends HttpServlet {
         // ###Redirect
         // A Redirect defines the contract of a
         // payment setup - what is the payment for and who
-        // is fulfilling it. Payment is created with
+        // is fulfilling it before redirecting to PayU. Redirect is created with
         // a `SetTransaction`.
         Redirect redirect= new Redirect();
         redirect.setRequest(setTransaction);
@@ -121,16 +121,16 @@ public class EbucksAuthenticateAccountServlet extends HttpServlet {
 
             setTransactionResponseMessage = (SetTransactionResponseMessage) redirect.setup(apiContext);
 
-            LOGGER.info("Created payment with id = " + setTransactionResponseMessage.getPayUReference()
+            LOGGER.info("eBucks account authentication with id = " + setTransactionResponseMessage.getPayUReference()
                     + " and result code = " + setTransactionResponseMessage.getResultCode());
 
             req.setAttribute("redirectURL", redirect.getPayURedirectUrl());
 
-            ResultPrinter.addResult(req, resp, "eBucks Payment Authentication",
-                    JSONFormatter.toJSON(setTransaction),
-                    JSONFormatter.toJSON(setTransactionResponseMessage), null);
+            ResultPrinter.addResult(req, resp, "eBucks Account Authentication",
+                    Redirect.getLastRequest(),
+                    Redirect.getLastResponse(), null);
         } catch (PayUSOAPException ex) {
-            ResultPrinter.addResult(req, resp, "eBucks Payment Authentication",
+            ResultPrinter.addResult(req, resp, "eBucks Account Authentication",
                     JSONFormatter.toJSON(setTransaction),
                     JSONFormatter.toJSON(setTransactionResponseMessage), ex.getMessage());
         }
