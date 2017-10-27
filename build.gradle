@@ -38,7 +38,7 @@ def getRepositoryPassword() {
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
-// ## REST API SDK
+// ## PAYU API SDK
 project(':payu-mea-java-sdk') {
     apply plugin: 'signing'
 
@@ -111,7 +111,7 @@ project(':payu-mea-java-sdk') {
                 groupId  'co.za.payu.sdk'
                 artifactId 'payu-mea-java-sdk'
                 packaging 'jar'
-                description 'PayU Java SDK for integrating with the SOAP APIs'
+                description 'PayU MEA Secure Payments Java SDK for integrating with the SOAP APIs'
                 url 'https://github.com/netcraft-devops/payu-mea-java-sdk.git'
 
                 scm {
@@ -129,7 +129,7 @@ project(':payu-mea-java-sdk') {
 
                 developers {
                     developer {
-                        id 'onahkenneth'
+                        id 'netcraft-devops'
                         name 'Kenneth Onah'
                         email 'kenneth@netcraft-devops.com'
                     }
@@ -144,7 +144,7 @@ project(':payu-mea-java-sdk') {
     }
 }
 
-// ## REST API SAMPLE PROJECT
+// ## PAYU API SAMPLE PROJECT
 project(':payu-mea-java-sample') {
     apply plugin: 'jetty'
 
@@ -155,5 +155,6 @@ project(':payu-mea-java-sample') {
         compile 'org.apache.logging.log4j:log4j-api:2.1'
         compile 'org.apache.logging.log4j:log4j-core:2.1'
         compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.1'
+        compile 'org.slf4j:slf4j-api:1.7.21'
     }
 }
