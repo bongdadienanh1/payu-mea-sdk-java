@@ -18,5 +18,5 @@ import co.za.payu.base.soap.PayUResource;
  *
  * @package co.za.payu.api
  */
-public class Reserve extends PayUResource {
+public class Reserve extends PayUResource implements IResponse {
 }

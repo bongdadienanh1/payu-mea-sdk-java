@@ -18,13 +18,5 @@ import lombok.experimental.Accessors;
 /**
  * Shows details for a payment, by ID.
  */
-
-@Getter @Setter
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
-public class LookupTransaction extends PayUResource {
-    /**
-     * Lookup transction response
-     */
-    private Response response;
+public class LookupTransaction extends PayUResource implements IResponse {
 }

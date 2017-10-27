@@ -9,6 +9,7 @@
  */
 package co.za.payu.api;
 
+import co.za.payu.base.soap.PayUModel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,7 @@ import lombok.experimental.Accessors;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-public class TransactionBase extends CartBase {
+public class TransactionBase extends PayUModel {
     public static final String STATE_NEW = "NEW";
     public static final String STATE_PROCESSING = "PROCESSING";
     public static final String STATE_TIMEOUT = "TIMEOUT";
@@ -47,16 +48,4 @@ public class TransactionBase extends CartBase {
      * The showBudget flag provides for budget payment.
      */
     private boolean showBudget;
-    /**
-     * Debit order transaction record
-     */
-    private TransactionRecord $transactionRecord;
-    /**
-     * Fraud management
-     */
-    private FmDetails fraudManagement;
-    /**
-     * Shipping information
-     */
-    private ShippingInfo shippingInfo;
 }

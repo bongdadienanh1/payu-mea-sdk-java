@@ -10,6 +10,10 @@
 package co.za.payu.api;
 
 import co.za.payu.base.soap.PayUResource;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * Class Capture
@@ -18,5 +22,9 @@ import co.za.payu.base.soap.PayUResource;
  *
  * @package co.za.payu.api
  */
-public class Capture extends PayUResource {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
+public class Capture extends PayUResource implements IResponse {
 }

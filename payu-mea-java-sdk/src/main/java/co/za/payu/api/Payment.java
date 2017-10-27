@@ -14,15 +14,7 @@ import co.za.payu.base.soap.PayUResource;
 /**
  * Class Payment
  *
- * Lets you create, process and manage payments.
- *
- * @package co.za.payu.api
+ * Lets you create, process and manage direct/inline enterprise payments.
  */
-public class Payment extends PayUResource {
-
-    public EFTBase getEftProUrl() {
-        EFTBase redirect = getResponse().getRedirect();
-
-        return redirect;
-    }
+public class Payment extends PayUResource implements IResponse {
 }

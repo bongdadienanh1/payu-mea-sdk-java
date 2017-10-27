@@ -9,19 +9,24 @@
  */
 package co.za.payu.api;
 
+import co.za.payu.base.ClientCredentials;
+import co.za.payu.base.Constants;
+import co.za.payu.base.soap.AuthCredential;
 import co.za.payu.base.soap.PayUResource;
+import co.za.payu.ws.SetTransactionResponseMessage;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.util.Map;
 
+
 /**
- * Class Payment
+ * Class Redirect
  *
  * Lets you create, process and manage redirect payments.
- *
- * @package co.za.payu.api
  */
-public class Redirect extends PayUResource {
-    public static final String REDIRECT_URL = "https://%s.payu.co.za/rpp.do?PayUReference=%s";
+public class Redirect extends PayUResource implements IResponse {
+    public static final String REDIRECT_URL = Constants.APPROVAL_URL;
 
     /**
      * PayU redirect url. Customer is redirected to PayU to capture payment details.
@@ -30,15 +35,20 @@ public class Redirect extends PayUResource {
      */
     public String getPayURedirectUrl()
     {
-        Map<String, String> config = getConfigurations();
-        String mode = config.get("mode");
+        Map<String, String> configurationMap = apiContext.getConfigurationMap();
+        String mode = configurationMap.get(Constants.MODE);
 
-        String reference = getResponse().getPayUReference();
+        String response = getLastResponse();
 
-        if (mode.equals("") || reference.equals(""))
-            return null;
+        Gson gson = new Gson();
+        Map<String, String> responseMap = gson.fromJson(response, Map.class);
 
-        String url = String.format(Redirect.REDIRECT_URL, mode.equalsIgnoreCase("sandbox") ? "staging" : "secure", reference);
+        if (mode == null || !(mode.equals(Constants.LIVE) || mode.equals(Constants.SANDBOX))) {
+            throw new IllegalArgumentException("Mode needs to be either `sandbox` or `live`.");
+        }
+
+        String url = String.format(Redirect.REDIRECT_URL,
+                mode.equalsIgnoreCase("sandbox") ? "staging" : "secure", responseMap.get("pay_u_reference"));
 
         return url;
     }
