@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * BasicAuthCredential is used for storing of Authentication credentials used by PayU
+ * AuthCredential is used for storing of Authentication credentials used by PayU
  * SOAP API service. Username, password and Safekey are required by the class to. The
  * class has two constructors, one of it taking an additional configuration map
  * used for dynamic configuration. When using the constructor with out
@@ -21,8 +21,8 @@ import java.util.Map;
  * have a entry by the name "mode" with values sandbox or live wherein the
  * corresponding endpoints are default to PayU endpoints.
  */
-public class BasicAuthCredential {
-    private static final Logger log = LoggerFactory.getLogger(BasicAuthCredential.class);
+public class AuthCredential {
+    private static final Logger log = LoggerFactory.getLogger(AuthCredential.class);
 
     /**
      * Username for API
@@ -55,13 +55,13 @@ public class BasicAuthCredential {
     private SDKVersion sdkVersion;
 
     /**
-     * Pass API user, password and safekey to BasicAuthCredential.
+     * Pass API user, password and safekey to AuthCredential.
      *
      * @param username Username for API
      * @param password Password for API
      * @param safekey Safekey for API
      */
-    public BasicAuthCredential(String username, String password, String safekey) {
+    public AuthCredential(String username, String password, String safekey) {
         super();
         this.username = username;
         this.password = password;
@@ -82,7 +82,7 @@ public class BasicAuthCredential {
      *            present then there should be entry for 'mode' with values
      *            sandbox/live, wherein PayUs endpoints are used.
      */
-    public BasicAuthCredential(String username, String password, String safekey, Map<String, String> configurationMap) {
+    public AuthCredential(String username, String password, String safekey, Map<String, String> configurationMap) {
         super();
         this.username = username;
         this.password = password;
@@ -104,9 +104,9 @@ public class BasicAuthCredential {
      * Sets Headers for every calls.
      *
      * @param headers
-     * @return {@link BasicAuthCredential}
+     * @return {@link AuthCredential}
      */
-    public BasicAuthCredential setHeaders(Map<String, String> headers) {
+    public AuthCredential setHeaders(Map<String, String> headers) {
         this.headers = headers;
         return this;
     }
@@ -115,9 +115,9 @@ public class BasicAuthCredential {
      * Adds headers.
      *
      * @param headers
-     * @return {@link BasicAuthCredential}
+     * @return {@link AuthCredential}
      */
-    public BasicAuthCredential addHeaders(Map<String, String> headers) {
+    public AuthCredential addHeaders(Map<String, String> headers) {
         this.headers.putAll(headers);
         return this;
     }
@@ -127,9 +127,9 @@ public class BasicAuthCredential {
      *
      * @param key
      * @param value
-     * @return {@link BasicAuthCredential}
+     * @return {@link AuthCredential}
      */
-    public BasicAuthCredential addHeader(String key, String value) {
+    public AuthCredential addHeader(String key, String value) {
         this.headers.put(key, value);
         return this;
     }
@@ -184,9 +184,9 @@ public class BasicAuthCredential {
      *
      * @param key
      * @param value
-     * @return {@link BasicAuthCredential}
+     * @return {@link AuthCredential}
      */
-    public BasicAuthCredential addConfiguration(String key, String value) {
+    public AuthCredential addConfiguration(String key, String value) {
         if (this.configurationMap == null) {
             this.configurationMap = new HashMap<String, String>();
         }
@@ -197,9 +197,9 @@ public class BasicAuthCredential {
     /**
      * Adds configurations to list of configurations.
      * @param configurations
-     * @return {@link BasicAuthCredential}
+     * @return {@link AuthCredential}
      */
-    public BasicAuthCredential addConfigurations(Map<String, String> configurations) {
+    public AuthCredential addConfigurations(Map<String, String> configurations) {
         if (this.configurationMap == null) {
             this.configurationMap = new HashMap<String, String>();
         }
@@ -211,9 +211,9 @@ public class BasicAuthCredential {
      * Replaces existing configurations with provided map of configurations.
      *
      * @param configurations
-     * @return {@link BasicAuthCredential}
+     * @return {@link AuthCredential}
      */
-    public BasicAuthCredential setConfigurations(Map<String, String> configurations) {
+    public AuthCredential setConfigurations(Map<String, String> configurations) {
         this.configurationMap = configurations;
         return this;
     }

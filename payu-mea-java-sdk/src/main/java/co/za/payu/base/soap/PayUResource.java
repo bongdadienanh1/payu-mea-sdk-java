@@ -1,11 +1,12 @@
 package co.za.payu.base.soap;
 
-import co.za.payu.api.Response;
+import co.za.payu.api.IRequest;
+import co.za.payu.api.IResponse;
 import co.za.payu.base.*;
-import co.za.payu.base.exception.BaseException;
-import co.za.payu.base.exception.ActionRequiredException;
-import co.za.payu.base.exception.HttpErrorException;
+import co.za.payu.base.exception.*;
 import co.za.payu.base.sdk.info.SDKVersionImpl;
+
+import com.google.gson.Gson;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+
 /**
  * PayUResource acts as a base class for SOAP enabled resources.
  */
@@ -25,18 +25,19 @@ import java.util.Properties;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class PayUResource extends PayUModel {
+
     private static final Logger log = LoggerFactory.getLogger(PayUResource.class);
 
     /**
-     * Response after execution of API call
+     * APIContext instance
      */
-    protected Response response;
+    protected APIContext apiContext;
+
 	/**
 	 * The class relies on an implementation of APICallPreHandler (here
 	 * SOAPAPICallPreHandler) to get access to endpoint, HTTP headers, and
 	 * payload.
 	 */
-
     /**
      * Map used in dynamic configuration
      */
@@ -46,6 +47,11 @@ public class PayUResource extends PayUModel {
      * Configuration enabled flag
      */
     private static boolean configInitialized = false;
+
+    /**
+     * DoTransaction request payload
+     */
+    private IRequest iRequest;
 
     /**
      * Last request sent to Service
@@ -66,9 +72,9 @@ public class PayUResource extends PayUModel {
      * @param file
      *            File object of a properties entity
      * @throws PayUSOAPException
-     * @return	BasicAuthCredential instance with username, password and safekey stored in configuration file.
+     * @return	AuthCredential instance with username, password and safekey stored in configuration file.
      */
-    public static BasicAuthCredential initConfig(File file) throws PayUSOAPException {
+    public static AuthCredential initConfig(File file) throws PayUSOAPException {
         try {
             if (!file.exists()) {
                 throw new FileNotFoundException("File doesn't exist: "
@@ -91,12 +97,12 @@ public class PayUResource extends PayUModel {
      *
      * @param properties
      *            Properties object
-     * @return	BasicAuthCredential instance with username, password and safekey in given properties.
+     * @return	AuthCredential instance with username, password and safekey in given properties.
      */
-    public static BasicAuthCredential initConfig(Properties properties) {
+    public static AuthCredential initConfig(Properties properties) {
         configurationMap = SDKUtil.constructMap(properties);
         configInitialized = true;
-        return getBasicAuthCredential();
+        return getAuthCredential();
     }
 
     /**
@@ -111,9 +117,9 @@ public class PayUResource extends PayUModel {
      * @param inputStream
      *            InputStream
      * @throws PayUSOAPException
-     * @return	BasicAuthCredential instance with username, password and safekey stored in given inputStream.
+     * @return	AuthCredential instance with username, password and safekey stored in given inputStream.
      */
-    public static BasicAuthCredential initConfig(InputStream inputStream)
+    public static AuthCredential initConfig(InputStream inputStream)
             throws PayUSOAPException {
         try {
             Properties properties = new Properties();
@@ -124,7 +130,7 @@ public class PayUResource extends PayUModel {
 			 */
             configurationMap = SDKUtil.constructMap(properties);
             configInitialized = true;
-            return getBasicAuthCredential();
+            return getAuthCredential();
         } catch (IOException ioe) {
             log.error(ioe.getMessage(), ioe);
             throw new PayUSOAPException(ioe.getMessage(), ioe);
@@ -153,14 +159,28 @@ public class PayUResource extends PayUModel {
     }
 
     /**
-     * Returns BasicAuthCredential instance using username, password and safekey loaded from configuration.
-     * @return BasicAuthCredential instance.
+     * Returns request payload for doTransaction SOAP call
      */
-    public static BasicAuthCredential getBasicAuthCredential() {
+    public IRequest getRequest() {
+        return this.iRequest;
+    }
+
+    /**
+     * Sets request payload for doTransaction SOAP call
+     */
+    public void setRequest(IRequest iRequest) {
+        this.iRequest = iRequest;
+    }
+
+    /**
+     * Returns AuthCredential instance using username, password and safekey loaded from configuration.
+     * @return AuthCredential instance.
+     */
+    public static AuthCredential getAuthCredential() {
         if(configInitialized){
-            return new BasicAuthCredential(getUsername(), getPassword(), getSafekey(), configurationMap);
+            return new AuthCredential(getUsername(), getPassword(), getSafekey(), configurationMap);
         }else{
-            return new BasicAuthCredential(getUsername(), getPassword(), getSafekey());
+            return new AuthCredential(getUsername(), getPassword(), getSafekey());
         }
     }
 
@@ -197,49 +217,27 @@ public class PayUResource extends PayUModel {
     }
 
     /**
-     * Configures and executes REST call
-     *
-     * @param <T> Response Type for de-serialization
-     * @param apiContext {@link APIContext} to be used for the call.
-     * @param resourcePath Resource URI path
-     * @param payLoad Payload to Service
-     * @param clazz {@link Class} object used in De-serialization
-     * @return T
-     * @throws PayUSOAPException
-     */
-    public static <T> T configureAndExecute(APIContext apiContext,
-                                            String resourcePath, String payLoad,
-                                            Class<T> clazz) throws PayUSOAPException {
-        return configureAndExecute(apiContext, resourcePath, payLoad, clazz, null);
-    }
-
-    /**
      * Configures and executes REST call: Supports JSON
      *
-     * @param <T> Response Type for de-serialization
      * @param apiContext {@link APIContext} to be used for the call.
-     * @param resourcePath Resource URI path
-     * @param payLoad Payload to Service
-     * @param clazz {@link Class} object used in De-serialization
-     * @param accessToken Access Token to be used instead of apiContext
-     * @return T
+     * @param payload {@link PayUModel} to be used as request payload for the call.
+     * @param soapAction SOAP action to call
+     * @return IResponse
      * @throws PayUSOAPException
      */
-    public static <T> T configureAndExecute(APIContext apiContext,
-                                            String resourcePath, String payLoad,
-                                            Class<T> clazz, String accessToken) throws PayUSOAPException {
-        T t = null;
-        Map<String, String> cMap;
+    public static IResponse configureAndExecute(APIContext apiContext, IRequest payload, String soapAction) throws PayUSOAPException {
         String requestId;
+        IResponse response = null;
+        Map<String, String> cMap;
         Map<String, String> headersMap;
+
         if (apiContext != null) {
-            if (apiContext.getSdkVersion() != null) {
+            if (apiContext.getSdkVersion() == null) {
                 apiContext.setSdkVersion(new SDKVersionImpl());
             }
 
             if (apiContext.getConfigurationMap() != null) {
-                cMap = SDKUtil.combineDefaultMap(apiContext
-                        .getConfigurationMap());
+                cMap = SDKUtil.combineDefaultMap(apiContext.getConfigurationMap());
             } else {
                 if (!configInitialized) {
                     initializeToDefault();
@@ -248,19 +246,20 @@ public class PayUResource extends PayUModel {
 				/*
 				 * The Map returned here is already combined with default values
 				 */
-                cMap = new HashMap<String, String>(
-                        configurationMap);
+                cMap = new HashMap<String, String>(configurationMap);
             }
             headersMap = apiContext.getHTTPHeaders();
             requestId = apiContext.getRequestId();
 
             APICallPreHandler apiCallPreHandler = createAPICallPreHandler(cMap,
-                    payLoad, resourcePath, headersMap, requestId,
-                    apiContext.getSdkVersion());
-            HttpConfiguration httpConfiguration = createHttpConfiguration(cMap, apiCallPreHandler);
-            t = execute(apiCallPreHandler, httpConfiguration, clazz);
+                    soapAction, headersMap, requestId, payload, apiContext.getAccountPrefix(), apiContext.getSdkVersion());
+
+            ConnectionConfiguration httpConfiguration = createHttpConfiguration(cMap, apiCallPreHandler);
+
+            response = execute(apiCallPreHandler, httpConfiguration);
         }
-        return t;
+
+        return response;
     }
 
     /**
@@ -268,45 +267,55 @@ public class PayUResource extends PayUModel {
      * layer.
      *
      * @param configurationMap configuration Map
-     * @param payLoad Raw payload
-     * @param resourcePath URI part of the resource operated on
      * @param headersMap Custom HTTP headers map
      * @param requestId PayU Request Id
+     * @param request request payload
      * @param sdkVersion {@link SDKVersion} instance
      * @return APICallPreHandler
      */
     public static APICallPreHandler createAPICallPreHandler(
-            Map<String, String> configurationMap, String payLoad,
-            String resourcePath, Map<String, String> headersMap,
-            String requestId, SDKVersion sdkVersion) {
-        APICallPreHandler apiCallPreHandler = null;
-        SOAPAPICallPreHandler soapAPICallPreHandler = new SOAPAPICallPreHandler(
-                configurationMap, headersMap);
-        soapAPICallPreHandler.setResourcePath(resourcePath);
-        soapAPICallPreHandler.setRequestId(requestId);
-        soapAPICallPreHandler.setPayLoad(payLoad);
-        soapAPICallPreHandler.setSdkVersion(sdkVersion);
+            Map<String, String> configurationMap,
+            String soapAction, Map<String, String> headersMap,
+            String requestId, IRequest request, String accountPrefix,
+            SDKVersion sdkVersion
+    ) {
+        APICallPreHandler apiCallPreHandler;
+        SOAPAPICallPreHandler soapAPICallPreHandler = new SOAPAPICallPreHandler(configurationMap, headersMap);
+        soapAPICallPreHandler.setAccountPrefix(accountPrefix)
+                .setSoapAction(soapAction)
+                .setRequestId(requestId)
+                .setRequestPayload(request)
+                .setSdkVersion(sdkVersion)
+                .addAPIParameters();
+
+        String paymentMethods = request.getSupportedPaymentMethods();
+        if(paymentMethods == null || paymentMethods.isEmpty()) {
+            soapAPICallPreHandler.addSupportedPaymentMethods();
+        }
+
         apiCallPreHandler = soapAPICallPreHandler;
+
         return apiCallPreHandler;
     }
 
     /**
      * Execute the API call and return response
      *
-     * @param <T> Generic Type for response object construction
      * @param apiCallPreHandler Implementation of {@link APICallPreHandler}
-     * @param httpConfiguration {@link HttpConfiguration}
-     * @param clazz Response Object class
+     * @param httpConfiguration {@link ConnectionConfiguration}
      * @return Response Type
      * @throws PayUSOAPException
      */
-    private static <T> T execute(APICallPreHandler apiCallPreHandler,
-                                 HttpConfiguration httpConfiguration, Class<T> clazz) throws PayUSOAPException {
-        T t = null;
-        ConnectionManager connectionManager;
-        HttpConnection httpConnection;
-        Map<String, String> headers;
+    private static IResponse execute(APICallPreHandler apiCallPreHandler,
+                                           ConnectionConfiguration httpConfiguration) throws PayUSOAPException {
+        Connection connection;
         String responseString;
+        IResponse response;
+
+        Map<String, String> headers;
+
+        ConnectionManager connectionManager;
+
         try {
 
             // Headers
@@ -314,11 +323,11 @@ public class PayUResource extends PayUModel {
 
             // HttpConnection Initialization
             connectionManager = ConnectionManager.getInstance();
-            httpConnection = connectionManager.getConnection(httpConfiguration);
-            httpConnection.createAndconfigureHttpConnection(httpConfiguration);
+            connection = connectionManager.getConnection();
+            //connection.createAndconfigureConnection(httpConfiguration);
 
             // capture request and log if conditions are met
-            LASTREQUEST.set(apiCallPreHandler.getPayLoad());
+            LASTREQUEST.set(JSONFormatter.toJSON(apiCallPreHandler.getRequestPayload()));
             String mode = "";
             if (configurationMap != null) {
                 mode = configurationMap.get(Constants.MODE);
@@ -334,16 +343,16 @@ public class PayUResource extends PayUModel {
             }
 
             // send request and receive response
-            responseString = httpConnection.execute(null, apiCallPreHandler.getPayLoad(), headers);
+            response = connection.execute(apiCallPreHandler);
+
+            responseString = JSONFormatter.toJSON(response);
 
             // capture response and log if conditions are met
             LASTRESPONSE.set(responseString);
             if (!Constants.LIVE.equalsIgnoreCase(mode)) {
                 log.debug("response: " + LASTRESPONSE.get());
             }
-            if (clazz != null) {
-                t = JSONFormatter.fromJSON(responseString, clazz);
-            }
+
         } catch (ActionRequiredException e) {
             throw PayUSOAPException.createFromHttpErrorException(e);
         } catch (HttpErrorException e) {
@@ -352,11 +361,11 @@ public class PayUResource extends PayUModel {
             throw new PayUSOAPException(e.getMessage(), e);
         }
 
-        return t;
+        return response;
     }
 
     /**
-     * Utility method that creates a {@link HttpConfiguration} object from the
+     * Utility method that creates a {@link ConnectionConfiguration} object from the
      * passed information
      *
      * @param configurationMap Configuration to base the construction upon.
@@ -365,17 +374,14 @@ public class PayUResource extends PayUModel {
      * @throws BaseException
      * @throws PayUSOAPException
      */
-    private static HttpConfiguration createHttpConfiguration(Map<String, String> configurationMap,
-                                                             APICallPreHandler apiCallPreHandler) throws PayUSOAPException {
-        HttpConfiguration httpConfiguration = new HttpConfiguration();
-        String endpoint = apiCallPreHandler.getEndPoint();
+    private static ConnectionConfiguration createHttpConfiguration(Map<String, String> configurationMap,
+                                                                   APICallPreHandler apiCallPreHandler) throws PayUSOAPException {
+        ConnectionConfiguration httpConfiguration = new ConnectionConfiguration();
+        String endpoint = apiCallPreHandler.getServiceEndPoint();
         if (endpoint == null || endpoint.isEmpty()) {
             throw new PayUSOAPException("The endpoint could not be fetched properly. You may be missing `mode` in your configuration.");
         }
-        httpConfiguration.setEndPointUrl(apiCallPreHandler.getEndPoint());
-        httpConfiguration
-                .setGoogleAppEngine(Boolean.parseBoolean(configurationMap
-                        .get(Constants.GOOGLE_APP_ENGINE)));
+        httpConfiguration.setEndPointUrl(apiCallPreHandler.getServiceEndPoint());
         if (Boolean.parseBoolean(configurationMap
                 .get((Constants.USE_HTTP_PROXY)))) {
             httpConfiguration.setProxyPort(Integer.parseInt(configurationMap
@@ -416,18 +422,6 @@ public class PayUResource extends PayUModel {
         credentials.setSafekey(configurationMap.get(Constants.API_SAFEKEY));
         return credentials;
     }
-
-    /**
-     * @deprecated Please use static method `getCredential` instead.
-     *
-     * Returns ClientCredentials with username, password and safekey from configuration Map.
-     *
-     * @return Client credentials
-     */
-    public ClientCredentials getClientCredential() {
-        return PayUResource.getCredential();
-    }
-
     /**
      * Fetches the properties from default configuration file.
      *
@@ -462,5 +456,115 @@ public class PayUResource extends PayUModel {
                 }
             }
         }
+    }
+
+    /**
+     * Gets the details of a transaction. Merchant reference or PayU reference
+     * must be provide but not both. Providing both references will cause the
+     * request to fail.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse get(APIContext apiContext) throws PayUSOAPException {
+        String soapAction = "getTransaction";
+        this.apiContext = apiContext;
+
+        IResponse response = configureAndExecute(apiContext, this.getRequest(), soapAction);
+
+        apiContext.setRequestId(null);
+
+        return response;
+    }
+
+    /**
+     * Creates and processes a payment. In the JSON request body, include a `payment` object with the intent, customer,
+     * and transactions. Also include a notification URL in the `payment` object.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse create(APIContext apiContext) throws PayUSOAPException {
+        String soapAction = "doTransaction";
+        this.apiContext = apiContext;
+
+        IResponse response = configureAndExecute(apiContext, this.getRequest(), soapAction);
+
+        apiContext.setRequestId(null);
+
+        return response;
+    }
+
+    /**
+     * Setups a redirect payment before redirecting to PayU. In the JSON request body, include a `payment` object with
+     * the intent, customer, and transactions. Also include return and cancel URLs in the `payment` object.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse setup(APIContext apiContext) throws PayUSOAPException {
+        String soapAction = "setTransaction";
+        this.apiContext = apiContext;
+
+        IResponse response = configureAndExecute(apiContext, this.getRequest(), soapAction);
+
+        apiContext.setRequestId(null);
+
+        return response;
+    }
+
+    /**
+     * Creates and processes a finalized payment. In the JSON request body, include a `payment` object with the intent, customer,
+     * and transactions. For PayU payments, include redirect URLs in the `payment` object.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse capture(APIContext apiContext) throws PayUSOAPException {
+
+        return this.create(apiContext);
+    }
+
+    /**
+     * Refunds a captured/finalized payment. The request must include a PayU reference and merchant reference.
+     * For PayU payments, include redirect URLs in the `payment` object.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse refund(APIContext apiContext) throws PayUSOAPException {
+
+        return this.create(apiContext);
+    }
+
+    /**
+     * Voids a authorized/reserved payment. The request must include a PayU reference.
+     * For PayU payments, include redirect URLs in the `payment` object.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse voidTransaction(APIContext apiContext) throws PayUSOAPException {
+
+        return this.create(apiContext);
+    }
+
+    /**
+     * The lookup transaction method is used to lookup various details regarding users, transactions and services.
+     * The core parameters identify the merchant, the lookup type and additional custom fields.
+     * @param apiContext {@link APIContext } used for the API call.
+     * @return IResponse response object
+     * @throws PayUSOAPException
+     */
+    public IResponse lookup(APIContext apiContext) throws PayUSOAPException {
+
+        String soapAction = "getLookupTransaction";
+        this.apiContext = apiContext;
+
+        IResponse response = configureAndExecute(apiContext, this.getRequest(), soapAction);
+
+        apiContext.setRequestId(null);
+
+        return response;
     }
 }

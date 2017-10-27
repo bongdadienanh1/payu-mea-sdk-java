@@ -1,5 +1,7 @@
 package co.za.payu.base.soap;
 
+import co.za.payu.api.IRequest;
+import co.za.payu.api.Transaction;
 import co.za.payu.base.APICallPreHandler;
 import co.za.payu.base.Constants;
 import co.za.payu.base.SDKUtil;
@@ -8,37 +10,44 @@ import co.za.payu.base.codec.binary.Base64;
 import co.za.payu.base.exception.ActionRequiredException;
 import co.za.payu.base.util.UserAgentHeader;
 
+import co.za.payu.ws.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.namespace.QName;
+import javax.xml.soap.*;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SOAPAPICallPreHandler acts as a {@link APICallPreHandler} for SOAP API calls.
  * The implementation is PayU specific, To do custom implementation override
- * the protected methods
+ * the protected methods.
+ *
+ * SOAPAPICallPreHandler requires a configuration system to function
+ * properly. The configuration is initialized to default in PayUResource
+ * class if no configuration methods initConfig(..) was attempted before
+ * making the API call. The users can override this default file
+ * 'sdk_config.properties' by choosing different version of
+ * initConfig(...) and passing their custom configuration.
+ * Initializing to default means the system looks for a file specifically
+ * named 'sdk_config.properties' in the classpath and reads the
+ * configuration from there. 'Dynamic Configuration' enables the users to
+ * pass custom configuration (per call basis) as a Map object to override
+ * the default behavior for the system to function. For Dynamic
+ * configuration to take effect create a Map of custom configuration and set
+ * it in APIContext object, choose the overloaded method of the Resource
+ * class that takes APIContext object as a parameter and pass the APIContext
+ * object.
  */
 public class SOAPAPICallPreHandler implements APICallPreHandler {
-    /*
-	 * SOAPApiCallPreHandler requires a configuration system to function
-	 * properly. The configuration is initialized to default in PayUResource
-	 * class if no configuration methods initConfig(..) was attempted before
-	 * making the API call. The users can override this default file
-	 * 'sdk_config.properties' by choosing different version of
-	 * initConfig(...) and passing their custom configuration.
-	 * Initializing to default means the system looks for a file specifically
-	 * named 'sdk_config.properties' in the classpath and reads the
-	 * configuration from there. 'Dynamic Configuration' enables the users to
-	 * pass custom configuration (per call basis) as a Map object to override
-	 * the default behavior for the system to function. For Dynamic
-	 * configuration to take effect create a Map of custom configuration and set
-	 * it in APIContext object, choose the overloaded method of the Resource
-	 * class that takes APIContext object as a parameter and pass the APIContext
-	 * object.
-	 */
+    private static final Logger log = LoggerFactory.getLogger(SOAPAPICallPreHandler.class);
+
     /**
      * Configuration Map used for dynamic configuration
      */
@@ -55,9 +64,19 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
     private String resourcePath;
 
     /**
+     * SOAP action to call
+     */
+    private String soapAction;
+
+    /**
      * Request Id
      */
     private String requestId;
+
+    /**
+     * Account prefix
+     */
+    private String accountPrefix;
 
     /**
      * Custom headers Map
@@ -65,14 +84,20 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
     private Map<String, String> headersMap;
 
     /**
-     * Request Payload
+     * Request object
      */
-    private String payLoad;
+    private IRequest request;
 
     /**
      * {@link SDKVersion} instance
      */
     private SDKVersion sdkVersion;
+
+    /**
+     * Constructor using configurations dynamically
+     */
+    public SOAPAPICallPreHandler() {
+    }
 
     /**
      * Constructor using configurations dynamically
@@ -89,8 +114,7 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
      * @param configurationMap Map used for dynamic configuration
      * @param headersMap Headers Map
      */
-    public SOAPAPICallPreHandler(Map<String, String> configurationMap,
-                                 Map<String, String> headersMap) {
+    public SOAPAPICallPreHandler(Map<String, String> configurationMap, Map<String, String> headersMap) {
         this(configurationMap);
         this.headersMap = (headersMap == null) ? Collections
                 .<String, String> emptyMap() : headersMap;
@@ -98,30 +122,62 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
 
     /**
      * @param resourcePath the resourcePath to set
+     * @return SOAPAPICallPreHandler
      */
-    public void setResourcePath(String resourcePath) {
+    public SOAPAPICallPreHandler setResourcePath(String resourcePath) {
         this.resourcePath = resourcePath;
+
+        return this;
+    }
+
+    /**
+     * @param soapAction the SOAP action to call
+     * @return SOAPAPICallPreHandler
+     */
+    public SOAPAPICallPreHandler setSoapAction(String soapAction) {
+        this.soapAction = soapAction;
+
+        return this;
     }
 
     /**
      * @param requestId the requestId to set
+     * @return SOAPAPICallPreHandler
      */
-    public void setRequestId(String requestId) {
+    public SOAPAPICallPreHandler setRequestId(String requestId) {
         this.requestId = requestId;
+
+        return this;
     }
 
     /**
-     * @param payLoad the payLoad to set
+     * @param request the request object
+     * @return SOAPAPICallPreHandler
      */
-    public void setPayLoad(String payLoad) {
-        this.payLoad = payLoad;
+    public SOAPAPICallPreHandler setRequestPayload(IRequest request) {
+        this.request = request;
+
+        return this;
     }
 
     /**
      * @param sdkVersion the sdkVersion to set
+     * @return SOAPAPICallPreHandler
      */
-    public void setSdkVersion(SDKVersion sdkVersion) {
+    public SOAPAPICallPreHandler setSdkVersion(SDKVersion sdkVersion) {
         this.sdkVersion = sdkVersion;
+
+        return this;
+    }
+
+    /**
+     * @param accountPrefix the API account prefix
+     * @return SOAPAPICallPreHandler
+     */
+    public SOAPAPICallPreHandler setAccountPrefix(String accountPrefix) {
+        this.accountPrefix = accountPrefix;
+
+        return this;
     }
 
     /**
@@ -133,11 +189,25 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
         return getProcessedHeaderMap();
     }
 
-    public String getPayLoad() {
-        return getProcessedPayLoad();
+    /**
+     * Returns SOAP action to call
+     *
+     * @return String of SOAP action to call
+     */
+    public String getSoapAction() {
+        return soapAction;
     }
 
-    public String getEndPoint() {
+    /**
+     * Returns request
+     *
+     * @return Object of request
+     */
+    public IRequest getRequestPayload() {
+        return request;
+    }
+
+    public String getServiceEndPoint() {
 		/*
 		 * Process the EndPoint to append the resourcePath sent as a part of the
 		 * method call with the base endPoint retrieved from configuration
@@ -145,7 +215,7 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
 		 */
         String endPoint = null;
         try {
-            endPoint = getBaseURL().toURI().resolve(resourcePath).toString();
+            endPoint = getBaseURL().toURI().resolve(Constants.WSDL_PATH).toString();
         } catch (MalformedURLException e) {
             //
         } catch (URISyntaxException e) {
@@ -154,7 +224,7 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
         return endPoint;
     }
 
-    public BasicAuthCredential getCredential() {
+    public AuthCredential getCredential() {
         return null;
     }
 
@@ -224,22 +294,43 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
     /*
      * Return API username from configuration Map
      */
-    private String getUsername() {
-        return this.configurationMap.get(Constants.API_USERNAME);
+    private String getAPIUsername() {
+        String accountPrefix = Constants.ACCOUNT_PREFIX + getAccountPrefix() + '.';
+        return this.configurationMap.get(accountPrefix + Constants.API_USERNAME);
     }
 
     /*
      * Returns API password from configuration Map
      */
-    private String getPassword() {
-        return this.configurationMap.get(Constants.API_PASSWORD);
+    private String getAPIPassword() {
+        String accountPrefix = Constants.ACCOUNT_PREFIX + getAccountPrefix() + '.';
+        return this.configurationMap.get(accountPrefix + Constants.API_PASSWORD);
     }
 
     /*
      * Returns API safekey from configuration Map
      */
-    private String getSafekey() {
-        return this.configurationMap.get(Constants.API_SAFEKEY);
+    private String getAPISafekey() {
+        String accountPrefix = Constants.ACCOUNT_PREFIX + getAccountPrefix() + '.';
+        return this.configurationMap.get(accountPrefix + Constants.API_SAFEKEY);
+    }
+
+    /*
+     * Returns API safekey from configuration Map or instance variable
+     */
+    private String getAccountPrefix() {
+        if(accountPrefix != null)
+            return accountPrefix;
+
+        return this.configurationMap.get(Constants.ACCOUNT_PREFIX);
+    }
+
+    /*
+     * Returns payment methods from configuration Map
+     */
+    private String getPaymentMethods() {
+        String accountPrefix = Constants.ACCOUNT_PREFIX + getAccountPrefix() + '.';
+        return this.configurationMap.get(accountPrefix + Constants.PAYMENT_METHODS);
     }
 
     /*
@@ -281,12 +372,12 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
             headers.putAll(headersMap);
         }
 
-        if (getUsername() != null && getUsername().trim().length() > 0
-                && getPassword() != null
-                && getPassword().trim().length() > 0) {
+        if (getAPIUsername() != null && getAPIUsername().trim().length() > 0
+                && getAPIPassword() != null
+                && getAPIPassword().trim().length() > 0) {
             try {
                 headers.put(Constants.AUTHORIZATION_HEADER, "Basic "
-                        + encodeToBase64(getUsername(), getPassword()));
+                        + encodeToBase64(getAPIUsername(), getAPIPassword()));
             } catch (UnsupportedEncodingException e) {
                 // TODO
             }
@@ -308,16 +399,61 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
     }
 
     /**
-     * Override this method to process payload for processing
+     * Sets API version string and Safekey if not explicitly configured
      *
-     * @return PayLoad as String
+     * @return APICallPreHandler
      */
-    protected String getProcessedPayLoad() {
-		/*
-		 * Since the REST API of PayPal depends on json, which is well formed,
-		 * no additional processing is required.
-		 */
-        return payLoad;
+    public SOAPAPICallPreHandler addAPIParameters() {
+        if(request != null) {
+            if(request.getApi().isEmpty()) {
+                request.setApi(Constants.API_VERSION);
+            }
+            if(request.getSafekey().isEmpty()) {
+                request.setSafekey(this.getAPISafekey());
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Sets API version string and Safekey if not explicitly configured
+     *
+     * @return APICallPreHandler
+     */
+    public SOAPAPICallPreHandler addSupportedPaymentMethods() {
+        if(request != null && !soapAction.equals("getTransaction")) {
+            if(request instanceof DoTransaction) {
+                DoTransaction doTransaction = (DoTransaction) request;
+                if(doTransaction.getTransactionType() != TransactionType.RESERVE_CANCEL
+                        && doTransaction.getTransactionType() != TransactionType.CREDIT
+                        && doTransaction.getTransactionType() != TransactionType.FINALIZE
+                        && doTransaction.getEft().size() == 0) {
+                    request.setSupportedPaymentMethods(this.getPaymentMethods());
+                }
+            }
+        }
+        if(request != null && soapAction.equals("setTransaction")) {
+            if(request instanceof SetTransaction) {
+                SetTransaction setTransaction = (SetTransaction) request;
+                if(setTransaction.getTransactionType() != TransactionType.RESERVE_CANCEL
+                    && setTransaction.getTransactionType() != TransactionType.CREDIT
+                ) {
+                    List<CustomField> customFields = setTransaction.getCustomfield();
+                    if (customFields.size() >= 1) {
+                        for (CustomField c: customFields) {
+                            if(!c.getKey().equals("processingType")) {
+                                request.setSupportedPaymentMethods(this.getPaymentMethods());
+                            }
+                        }
+                    } else {
+                        request.setSupportedPaymentMethods(this.getPaymentMethods());
+                    }
+                }
+            }
+        }
+
+        return this;
     }
 
     /**
@@ -327,5 +463,67 @@ public class SOAPAPICallPreHandler implements APICallPreHandler {
      */
     public Map<String, String> getConfigurationMap() {
         return this.configurationMap;
+    }
+
+    /**
+     *
+     * @return Set<QName>
+     */
+    public Set<QName> getHeaders() {
+        return new TreeSet();
+    }
+
+    /**
+     *
+     * @param context SOAP message context
+     * @return
+     */
+    @Override
+    public boolean handleMessage(SOAPMessageContext context) {
+
+        String prefixUri = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-";
+        String uri = prefixUri + "wssecurity-secext-1.0.xsd";
+        String uta = prefixUri + "wssecurity-utility-1.0.xsd";
+        String ta = prefixUri + "username-token-profile-1.0#PasswordText";
+        Boolean outboundProperty = (Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+
+        if (outboundProperty) {
+            try {
+                String prefix = "wsse";
+                SOAPEnvelope envelope = context.getMessage().getSOAPPart().getEnvelope();
+                SOAPFactory factory = SOAPFactory.newInstance();
+                SOAPElement securityElem = factory.createElement("Security",prefix,uri);
+                SOAPElement tokenElem = factory.createElement("UsernameToken",prefix,uri);
+
+                tokenElem.addAttribute(QName.valueOf("wsu:Id"),"UsernameToken-9");
+                tokenElem.addAttribute(QName.valueOf("xmlns:wsu"), uta);
+
+                SOAPElement usernameElement = factory.createElement("Username",prefix,uri);
+                usernameElement.addTextNode(getAPIUsername());
+
+                SOAPElement passworddElement = factory.createElement("Password",prefix,uri);
+                passworddElement.addTextNode(getAPIPassword());
+                passworddElement.addAttribute(QName.valueOf("Type"), ta);
+
+                tokenElem.addChildElement(usernameElement);
+                tokenElem.addChildElement(passworddElement);
+
+                securityElem.addChildElement(tokenElem);
+                SOAPHeader header = envelope.getHeader();
+                header.addChildElement(securityElem);
+            } catch (Exception e) {
+                System.out.println("Exception in handler: " + e.getMessage());
+            }
+        }
+
+        return true;
+    }
+
+    public boolean handleFault(SOAPMessageContext context) {
+        return false;
+    }
+
+    public void close(MessageContext context) {
+        //
     }
 }

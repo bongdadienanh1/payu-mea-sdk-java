@@ -5,7 +5,7 @@ package co.za.payu.base;
  * Class contains http specific configuration parameters
  *
  */
-public class HttpConfiguration {
+public class ConnectionConfiguration {
     /**
      * Maximum retries on failure
      */
@@ -84,7 +84,7 @@ public class HttpConfiguration {
         this.ipAddress = ipAddress;
     }
 
-    public HttpConfiguration() {
+    public ConnectionConfiguration() {
 
         this.maxRetry = 2;
 

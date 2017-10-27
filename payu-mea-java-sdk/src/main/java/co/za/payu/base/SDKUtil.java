@@ -1,6 +1,6 @@
 package co.za.payu.base;
 
-import co.za.payu.base.soap.PayUSOAPException;
+import co.za.payu.base.exception.PayUSOAPException;
 
 import java.util.*;
 import java.util.Map.Entry;

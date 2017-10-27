@@ -3,7 +3,7 @@ package co.za.payu.base;
 import javax.net.ssl.SSLContext;
 
 /**
- * ConnectionManager acts as a interface to retrieve {@link HttpConnection}
+ * ConnectionManager acts as a interface to retrieve {@link Connection}
  * objects used by API service
  *
  */
@@ -36,26 +36,11 @@ public final class ConnectionManager {
     /**
      * @return HttpConnection object
      */
-    public HttpConnection getConnection() {
+    public Connection getConnection() {
         if(customSslContext != null) {
-            return new DefaultHttpConnection(customSslContext);
+            return new DefaultConnection(customSslContext);
         } else {
-            return new DefaultHttpConnection();
-        }
-    }
-
-    /**
-     * Overloaded method used factory to load GoogleAppEngineSpecific connection
-     *
-     * @param httpConfig
-     *            {@link HttpConfiguration} object
-     * @return {@link HttpConnection} object
-     */
-    public HttpConnection getConnection(HttpConfiguration httpConfig) {
-        if (httpConfig.isGoogleAppEngine()) {
-            return new GoogleAppEngineHttpConnection();
-        } else {
-            return getConnection();
+            return new DefaultConnection();
         }
     }
 

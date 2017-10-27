@@ -2,7 +2,7 @@ package co.za.payu.base;
 
 import co.za.payu.base.codec.binary.Base64;
 import co.za.payu.base.exception.SSLConfigurationException;
-import co.za.payu.base.soap.PayUSOAPException;
+import co.za.payu.base.exception.PayUSOAPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,7 +254,7 @@ public abstract class SSLUtil {
         }
         try {
             Map<String, String> headerMap = new HashMap<String, String>();
-            HttpConfiguration httpConfiguration = new HttpConfiguration();
+            ConnectionConfiguration httpConfiguration = new ConnectionConfiguration();
             httpConfiguration.setEndPointUrl(urlPath);
             httpConfiguration.setConnectionTimeout(Integer
                     .parseInt(configurations.get(Constants.HTTP_CONNECTION_TIMEOUT)));
@@ -263,9 +263,9 @@ public abstract class SSLUtil {
             httpConfiguration.setMaxHttpConnection(Integer
                     .parseInt(configurations.get(Constants.HTTP_CONNECTION_MAX_CONNECTION)));
             httpConfiguration.setHttpMethod("GET");
-            HttpConnection connection = ConnectionManager.getInstance()
+            Connection connection = ConnectionManager.getInstance()
                     .getConnection();
-            connection.createAndconfigureHttpConnection(httpConfiguration);
+            connection.createAndconfigureConnection(httpConfiguration);
             URL url = new URL(urlPath);
             headerMap.put("Host", url.getHost());
             return connection.executeWithStream(url.toString(), "", headerMap);

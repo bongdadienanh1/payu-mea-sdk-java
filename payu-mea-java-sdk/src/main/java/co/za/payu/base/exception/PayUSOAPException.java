@@ -1,7 +1,7 @@
-package co.za.payu.base.soap;
+package co.za.payu.base.exception;
 
+import co.za.payu.base.soap.JSONFormatter;
 import com.google.gson.Gson;
-import co.za.payu.base.exception.HttpErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class PayUSOAPException extends Exception {
      * 				{@link HttpErrorException} thrown from API call
      * @return PayUSOAPException
      */
-    protected static PayUSOAPException createFromHttpErrorException(HttpErrorException httpErrorException){
+    public static PayUSOAPException createFromHttpErrorException(HttpErrorException httpErrorException){
         PayUSOAPException ppre = new PayUSOAPException(httpErrorException.getMessage(), httpErrorException);
         ppre.setResponsecode(httpErrorException.getResponsecode());
         if( httpErrorException.getResponsecode() >= 400 &&  httpErrorException.getErrorResponse()!=null && isJSONValid(httpErrorException.getErrorResponse())) {

@@ -15,13 +15,13 @@ import java.security.PrivilegedExceptionAction;
  * Wrapper class used for HttpsURLConnection
  *
  */
-public class DefaultHttpConnection extends HttpConnection {
+public class DefaultConnection extends Connection {
     /**
      * Secure Socket Layer context
      */
     private SSLContext sslContext;
 
-    public DefaultHttpConnection() {
+    public DefaultConnection() {
         try {
             sslContext = SSLUtil.getSSLContext(null);
         } catch (SSLConfigurationException e) {
@@ -29,7 +29,7 @@ public class DefaultHttpConnection extends HttpConnection {
         }
     }
 
-    public DefaultHttpConnection(SSLContext sslContext) {
+    public DefaultConnection(SSLContext sslContext) {
         this.sslContext = sslContext;
     }
 
@@ -43,7 +43,7 @@ public class DefaultHttpConnection extends HttpConnection {
     }
 
     @Override
-    public void createAndconfigureHttpConnection(HttpConfiguration clientConfiguration) throws IOException {
+    public void createAndconfigureConnection(ConnectionConfiguration clientConfiguration) throws IOException {
         this.config = clientConfiguration;
         URL url = new URL(this.config.getEndPointUrl());
         Proxy proxy = null;

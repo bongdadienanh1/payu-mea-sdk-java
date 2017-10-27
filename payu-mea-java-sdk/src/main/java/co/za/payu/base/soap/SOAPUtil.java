@@ -1,6 +1,7 @@
 package co.za.payu.base.soap;
 
 import co.za.payu.base.Constants;
+import co.za.payu.base.exception.PayUSOAPException;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

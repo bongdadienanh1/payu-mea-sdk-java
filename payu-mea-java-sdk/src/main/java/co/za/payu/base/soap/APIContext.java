@@ -8,7 +8,7 @@ import java.util.UUID;
 
 /**
  * <code>APIContext</code> wraps wire-level parameters for the API call.
- * BasicAuthCredential, is treated as a mandatory
+ * AuthCredential, is treated as a mandatory
  * parameter for (PayU SOAP APIs). RequestId is generated if not supplied for
  * marking Idempotency of the API call. The Application Header property may be used by
  * clients to access application level headers. The clients are responsible to
@@ -31,21 +31,58 @@ public class APIContext {
     private SDKVersion sdkVersion;
 
     /**
-     * {@link BasicAuthCredential} credential instance
+     * {@link AuthCredential} credential instance
      */
-    private BasicAuthCredential credential;
+    private AuthCredential credential;
 
     /**
      * Pass the clientID, secret and mode. The easiest, and most widely used
      * option.
      *
-     * @param username
-     * @param password
-     * @param safekey
-     * @param mode
+     * @param username API username
+     * @param password API password
+     */
+    public APIContext(String username, String password) {
+        this(username, password, null);
+    }
+
+    /**
+     * Pass the clientID, secret and mode. The easiest, and most widely used
+     * option.
+     *
+     * @param username API username
+     * @param password API password
+     * @param safekey API safekey
+     */
+    public APIContext(String username, String password, String safekey) {
+        this(username, password, safekey, null);
+    }
+
+    /**
+     * Pass the clientID, secret and mode. The easiest, and most widely used
+     * option.
+     *
+     * @param username API username
+     * @param password API password
+     * @param safekey API safekey
+     * @param mode API mode
      */
     public APIContext(String username, String password, String safekey, String mode) {
         this(username, password, safekey, mode, null);
+    }
+
+    /**
+     * Pass the clientID, secret and mode. The easiest, and most widely used
+     * option.
+     *
+     * @param username API username
+     * @param password API password
+     * @param safekey API safekey
+     * @param mode API mode
+     * @param accountPrefix API account prefix
+     */
+    public APIContext(String username, String password, String safekey, String mode, String accountPrefix) {
+        this(username, password, safekey, mode, accountPrefix,null);
     }
 
     /**
@@ -57,12 +94,27 @@ public class APIContext {
      * @param mode
      * @param configurations
      */
-    public APIContext(String username, String password, String safekey, String mode, Map<String, String> configurations) {
-        this.credential = new BasicAuthCredential(username, password, safekey);
+    public APIContext(String username, String password, String safekey, String mode, String accountPrefix, Map<String, String> configurations) {
+        this.credential = new AuthCredential(username, password, safekey);
         if (configurations != null && configurations.size() > 0) {
             this.credential.addConfigurations(configurations);
         }
+        this.setAccountPrefix(accountPrefix);
         this.setMode(mode);
+    }
+
+    /**
+     * Sets account prefix.
+     * @param accountPrefix account prefix
+     * @return {@link APIContext}
+     */
+    public APIContext setAccountPrefix(String accountPrefix) {
+        if (accountPrefix != null && !accountPrefix.equals("")) {
+            this.credential.addConfiguration(Constants.ACCOUNT_PREFIX, accountPrefix);
+        }
+
+
+        return this;
     }
 
     /**
@@ -76,16 +128,6 @@ public class APIContext {
         }
         this.credential.addConfiguration(Constants.MODE, mode);
         return this;
-    }
-
-    /**
-     * Enables settings for Google App Engine. Please set to `true` if using SDK in Google App Engine.
-     *
-     * @param usingGoogleAppEngine
-     * @return {@link APIContext}
-     */
-    public APIContext usingGoogleAppEngine(boolean usingGoogleAppEngine) {
-        return this.addConfiguration(Constants.GOOGLE_APP_ENGINE, String.valueOf(usingGoogleAppEngine));
     }
 
     /**
@@ -242,7 +284,8 @@ public class APIContext {
     public String getUsername() {
         if (this.credential == null) {
             throw new IllegalArgumentException(
-                    "Username, Password and Safekey are required. Please use APIContext(String username, String password, String safekey, String mode)");
+                    "Username is required. Please use APIContext(String username, String password, " +
+                            "String safekey, String accountPrefix, String mode)");
         }
         return this.credential.getUsername();
     }
@@ -250,7 +293,8 @@ public class APIContext {
     public String getPassword() {
         if (this.credential == null) {
             throw new IllegalArgumentException(
-                    "Username, Password and Safekey are required. Please use APIContext(String username, String password, String safekey, String mode)");
+                    "Password is required. Please use APIContext(String username, String password, " +
+                            "String safekey, String accountPrefix, String mode)");
         }
         return this.credential.getPassword();
     }
@@ -258,8 +302,18 @@ public class APIContext {
     public String getSafekey() {
         if (this.credential == null) {
             throw new IllegalArgumentException(
-                    "Username, Password and Safekey are required. Please use APIContext(String username, String password, String safekey, String mode)");
+                    "Safekey is required. Please use APIContext(String username, String password, " +
+                            "String safekey, String accountPrefix, String mode)");
         }
         return this.credential.getSafekey();
+    }
+
+    public String getAccountPrefix() {
+        if (this.credential == null) {
+            throw new IllegalArgumentException(
+                    "Account prefix is required. Please use APIContext(String username, String password, " +
+                            "String safekey, String accountPrefix, String mode)");
+        }
+        return this.credential.getConfiguration(Constants.ACCOUNT_PREFIX);
     }
 }
