@@ -189,10 +189,12 @@ pip-log.txt
 
 # Output files
 payu-mea-java-sdk/test-output/
-
+out/
 # Gradle
 .gradle
 build/
+gradle.properties
+wsimport-binding.xml
 
 # Ignore Gradle GUI config
 gradle-app.setting
